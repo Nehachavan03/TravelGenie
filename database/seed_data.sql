@@ -1,3 +1,4 @@
+USE travel_planner;
 INSERT INTO countries (country_code, country_name) VALUES
 ('IN','India'),
 ('US','United States'),
@@ -61,7 +62,7 @@ INSERT INTO places (city_id,name,description,address,category_id) VALUES
 
 -- Mumbai (1)
 (1,'Gateway of India','Historic monument','Mumbai',5),
-(1,'Marine Drive','Seaside promenade','Mumbai',3),
+(1,'Marine Drive','Seaside promenade','Mumbai',6),
 (1,'Elephanta Caves','Ancient cave temples','Mumbai',1),
 (1,'Juhu Beach','Popular beach','Mumbai',3),
 (1,'Siddhivinayak Temple','Famous temple','Mumbai',4),

@@ -3,12 +3,12 @@ USE travel_planner;
 -- Get all countries
 SELECT * FROM countries;
 
--- Get cities in a country
+-- Get cities in India
 SELECT city_id, name, pincode
 FROM cities
 WHERE country_code = 'IN';
 
--- Get all cities with country name
+-- Get all cities with country
 SELECT c.city_id, c.name AS city, co.country_name
 FROM cities c
 JOIN countries co
@@ -66,7 +66,7 @@ ON id.place_id = p.place_id
 WHERE i.itinerary_id = 1
 ORDER BY id.day_no;
 
--- Get top rated places
+-- Top rated places
 SELECT p.name,
 AVG(r.rating) AS average_rating
 FROM places p
@@ -83,12 +83,15 @@ LEFT JOIN places p
 ON c.city_id = p.city_id
 GROUP BY c.city_id;
 
-USE travel_planner;
+-- Update user names
+UPDATE users SET name = 'Lakshita Ingale' WHERE user_id = 2;
+UPDATE users SET name = 'Anika Prasad' WHERE user_id = 3;
+UPDATE users SET name = 'Parth Samale' WHERE user_id = 4;
 
-UPDATE users SET name = 'Lakshita ingale' WHERE user_id = 2;
-UPDATE users SET name = 'Anika prasad' WHERE user_id = 3;
-UPDATE users SET name = 'Parth samale' WHERE user_id = 4;
-
+-- Update user emails
 UPDATE users SET email = 'lakshita@example.com' WHERE user_id = 2;
 UPDATE users SET email = 'anika@example.com' WHERE user_id = 3;
 UPDATE users SET email = 'parth@example.com' WHERE user_id = 4;
+
+-- Show users
+SELECT * FROM users;
