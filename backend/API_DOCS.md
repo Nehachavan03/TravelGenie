@@ -26,7 +26,7 @@ Example
 http://localhost:5000/cities/IN
 
 ---
-
+git 
 ## 3. Get places by city
 
 **GET /places/:city_id**
