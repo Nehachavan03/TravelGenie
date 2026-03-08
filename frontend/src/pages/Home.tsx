@@ -103,7 +103,7 @@ const Home: React.FC = () => {
                             >
                                 <div className="relative h-56 overflow-hidden">
                                     <img
-                                        src={country.image_url || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=1000'}
+                                        src={country.image_url || `https://tse1.mm.bing.net/th?q=${encodeURIComponent(country.name)}+country+landscape&w=800&h=600&c=7&rs=1&p=0`}
                                         alt={country.name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Star } from 'lucide-react';
+import { Star, Send } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 interface Review {
     id: string;
@@ -16,8 +18,14 @@ interface ReviewSectionProps {
 }
 
 const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId }) => {
+    const { user } = useAuth();
     const [reviews, setReviews] = useState<Review[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Form state
+    const [rating, setRating] = useState(5);
+    const [comment, setComment] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -53,12 +61,106 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId }) => {
         fetchReviews();
     }, [placeId]);
 
+    const handleSubmitReview = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) {
+            toast.error('You must be logged in to leave a review.');
+            return;
+        }
+        if (!comment.trim()) {
+            toast.error('Please write a comment.');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const response = await api.post('/reviews', {
+                user_id: user.id,
+                place_id: placeId,
+                rating,
+                comment
+            });
+            // Update the UI immediately by putting the new review at the top
+            setReviews([response.data, ...reviews]);
+            setComment('');
+            setRating(5);
+            toast.success('Your review was added!');
+        } catch (error) {
+            console.error('Error submitting review:', error);
+            toast.error('Could not submit review. Please try again later.');
+
+            // Mock offline optimistic update
+            setReviews([{
+                id: `mock-${Date.now()}`,
+                user_name: user?.name || 'You',
+                place_id: placeId,
+                rating,
+                comment,
+                created_at: new Date().toISOString()
+            }, ...reviews]);
+            setComment('');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <div className="bg-gray-50 rounded-2xl p-6 mt-8 border border-gray-100">
             <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <Star className="fill-yellow-400 text-yellow-400 h-6 w-6" />
                 Traveler Reviews
             </h3>
+
+            {/* Review Submission Form */}
+            {user ? (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-8">
+                    <h4 className="font-semibold text-gray-900 mb-3">Write a Review</h4>
+                    <form onSubmit={handleSubmitReview}>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                            <div className="flex gap-1">
+                                {[1, 2, 3, 4, 5].map((starValue) => (
+                                    <button
+                                        type="button"
+                                        key={starValue}
+                                        onClick={() => setRating(starValue)}
+                                        className="focus:outline-none transition-transform hover:scale-110"
+                                    >
+                                        <Star
+                                            size={24}
+                                            className={starValue <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Share your experience</label>
+                            <textarea
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                rows={3}
+                                className="w-full rounded-lg border-gray-300 border px-3 py-2 text-gray-900 focus:ring-primary-500 focus:border-primary-500 shadow-sm resize-none"
+                                placeholder="What did you think of this place?"
+                            ></textarea>
+                        </div>
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-primary-600 hover:bg-primary-700 transition-colors disabled:opacity-50"
+                            >
+                                <Send size={16} className="mr-2" />
+                                {isSubmitting ? 'Posting...' : 'Post Review'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            ) : (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-8 text-center">
+                    <p className="text-gray-600">Please log in to write a review.</p>
+                </div>
+            )}
 
             {isLoading ? (
                 <div className="space-y-4">

@@ -70,10 +70,10 @@ router.post("/", (req, res) => {
 
         let dayPlan = [];
 
-        for (let i = 0; i < 3 && index < places.length; i++) {
+        for (let i = 0; i < 3; i++) {
           dayPlan.push({
-            time: `${10 + (index % 4)}:00 AM`,
-            name: places[index].name
+            time: `${10 + (i % 4)}:00 AM`,
+            name: places[index % places.length].name
           });
           index++;
         }

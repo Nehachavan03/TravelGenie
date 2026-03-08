@@ -99,7 +99,7 @@ const Cities: React.FC = () => {
                         >
                             <div className="relative h-56 overflow-hidden">
                                 <img
-                                    src={city.image_url || 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&q=80&w=1000'}
+                                    src={city.image_url || `https://tse1.mm.bing.net/th?q=${encodeURIComponent(city.name)}+city+landmark&w=800&h=600&c=7&rs=1&p=0`}
                                     alt={city.name}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />

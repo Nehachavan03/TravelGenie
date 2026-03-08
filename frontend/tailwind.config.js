@@ -8,11 +8,11 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          500: '#14b8a6', // teal-500
-          600: '#0d9488',
-          700: '#0f766e',
+          50: '#fffbeb',  // cream
+          100: '#fef3c7', // light yellow
+          500: '#eab308', // yellow
+          600: '#ca8a04', // royal yellow
+          700: '#a16207', // dark royal yellow
         },
       },
       fontFamily: {

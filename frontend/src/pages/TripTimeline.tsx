@@ -15,6 +15,7 @@ interface ItineraryItem {
 
 interface TripDetails {
     id: string;
+    city_id: string;
     city_name: string;
     start_date: string;
     end_date: string;
@@ -39,6 +40,7 @@ const TripTimeline: React.FC = () => {
                 // Mock data for UI 
                 setTrip({
                     id: id || 't1',
+                    city_id: '1',
                     city_name: 'Paris',
                     start_date: '2026-06-15',
                     end_date: '2026-06-22',
@@ -112,7 +114,7 @@ const TripTimeline: React.FC = () => {
                     </div>
                 </div>
                 <div className="mt-6 md:mt-0 relative z-10 flex gap-3 justify-center">
-                    <Link to={`/cities/${trip.city_name}`} className="bg-white border-2 border-primary-500 text-primary-600 px-5 py-2.5 rounded-lg font-medium hover:bg-primary-50 transition-colors shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                    <Link to={`/cities/${trip.city_id}`} className="bg-white border-2 border-primary-500 text-primary-600 px-5 py-2.5 rounded-lg font-medium hover:bg-primary-50 transition-colors shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
                         Add Places
                     </Link>
                 </div>

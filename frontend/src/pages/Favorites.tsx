@@ -107,7 +107,7 @@ const Favorites: React.FC = () => {
 
                             <div className="relative h-56 overflow-hidden">
                                 <img
-                                    src={place.image_url}
+                                    src={place.image_url || `https://tse1.mm.bing.net/th?q=${encodeURIComponent(place.name)}+landmark+photo&w=800&h=600&c=7&rs=1&p=0`}
                                     alt={place.name}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 />

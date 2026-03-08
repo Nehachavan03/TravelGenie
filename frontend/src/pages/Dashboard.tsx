@@ -174,7 +174,7 @@ const Dashboard: React.FC = () => {
                             <div className="relative h-40 overflow-hidden bg-gray-200">
                                 {trip.image_url ? (
                                     <img
-                                        src={trip.image_url}
+                                        src={trip.image_url || `https://tse1.mm.bing.net/th?q=${encodeURIComponent(trip.city_name)}+city+landmark&w=800&h=600&c=7&rs=1&p=0`}
                                         alt={trip.city_name}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
@@ -227,14 +227,14 @@ const Dashboard: React.FC = () => {
                         <form onSubmit={handleCreateTrip} className="p-6 space-y-5">
                             <div>
                                 <label htmlFor="cityId" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Destination City Code/ID
+                                    Destination City Name
                                 </label>
                                 <input
                                     type="text"
                                     id="cityId"
                                     value={cityId}
                                     onChange={(e) => setCityId(e.target.value)}
-                                    placeholder="e.g. Paris, Tokyo, etc."
+                                    placeholder="e.g. Paris"
                                     className="w-full rounded-lg border-gray-300 border px-3 py-2 text-gray-900 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
                                     required
                                 />
