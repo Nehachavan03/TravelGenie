@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { Briefcase, Calendar, MapPin, Plus, X, Trash2 } from 'lucide-react';
+import { Briefcase, Calendar, Plus, X, Trash2 } from 'lucide-react';
 
 interface Trip {
     itinerary_id: string;
@@ -91,7 +91,7 @@ const Dashboard: React.FC = () => {
             };
 
             const response = await api.post('/itinerary/create', payload);
-            
+
             // Construct a Trip object compatible with the state
             const newTrip: Trip = {
                 itinerary_id: response.data.itinerary_id || `t${Date.now()}`,
@@ -99,9 +99,9 @@ const Dashboard: React.FC = () => {
                 start_date: startDate,
                 end_date: endDate,
                 budget: budget,
-                image_url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=1000'
+                image_url: `https://placehold.co/800x600/4f46e5/ffffff?text=${encodeURIComponent(cityId)}&font=playfair-display`
             };
-            
+
             setTrips([...trips, newTrip]);
             setIsCreateModalOpen(false);
             resetForm();
@@ -117,7 +117,7 @@ const Dashboard: React.FC = () => {
                 start_date: startDate,
                 end_date: endDate,
                 budget,
-                image_url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=1000'
+                image_url: `https://placehold.co/800x600/4f46e5/ffffff?text=${encodeURIComponent(cityId)}&font=playfair-display`
             };
             setTrips([...trips, newTrip]);
             setIsCreateModalOpen(false);
@@ -130,7 +130,7 @@ const Dashboard: React.FC = () => {
     const handleDeleteTrip = async (e: React.MouseEvent, id: string) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (!window.confirm('Are you sure you want to delete this trip?')) return;
 
         try {
@@ -210,17 +210,11 @@ const Dashboard: React.FC = () => {
                             </button>
 
                             <div className="relative h-40 overflow-hidden bg-gray-200">
-                                {trip.image_url ? (
-                                    <img
-                                        src={trip.image_url || `https://tse1.mm.bing.net/th?q=${encodeURIComponent(trip.city)}+city+landmark&w=800&h=600&c=7&rs=1&p=0`}
-                                        alt={trip.city}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-primary-100 text-primary-500">
-                                        <MapPin size={40} />
-                                    </div>
-                                )}
+                                <img
+                                    src={trip.image_url || `https://placehold.co/800x600/4f46e5/ffffff?text=${encodeURIComponent(trip.city)}&font=playfair-display`}
+                                    alt={trip.city}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                />
                                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-gray-700 shadow-sm">
                                     ₹ {trip.budget} Budget
                                 </div>

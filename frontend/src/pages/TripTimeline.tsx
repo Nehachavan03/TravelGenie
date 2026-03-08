@@ -94,87 +94,99 @@ const TripTimeline: React.FC = () => {
                 Back to Dashboard
             </Link>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-10 text-center md:text-left md:flex justify-between items-center relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 opacity-5 transform translate-x-4 -translate-y-4 shadow-sm pointer-events-none">
-                    <MapIcon size={120} />
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-10 text-center md:text-left relative overflow-hidden flex flex-col md:flex-row min-h-[200px]">
+                <div className="md:w-1/3 bg-gray-200 h-48 md:h-auto relative">
+                    <img
+                        src={`https://placehold.co/800x600/4f46e5/ffffff?text=${encodeURIComponent(trip.city_name)}&font=playfair-display`}
+                        alt={trip.city_name}
+                        className="w-full h-full object-cover"
+                    />
                 </div>
-                <div className="relative z-10">
-                    <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
-                        Trip to {trip.city_name}
-                    </h1>
-                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-gray-600 font-medium mt-4">
-                        <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                            <CalendarDays size={18} className="text-primary-500" />
-                            {new Date(trip.start_date).toLocaleDateString()} &mdash; {new Date(trip.end_date).toLocaleDateString()}
-                        </span>
-                        <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                            <span className="text-primary-500 font-bold">₹</span>
-                            {trip.budget} Budget
-                        </span>
+                <div className="p-8 flex-1 flex flex-col justify-center relative">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 transform translate-x-4 -translate-y-4 shadow-sm pointer-events-none hidden md:block">
+                        <MapIcon size={120} />
                     </div>
-                </div>
-                <div className="mt-6 md:mt-0 relative z-10 flex gap-3 justify-center">
-                    <Link to={`/cities/${trip.city_id}`} className="bg-white border-2 border-primary-500 text-primary-600 px-5 py-2.5 rounded-lg font-medium hover:bg-primary-50 transition-colors shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
-                        Add Places
-                    </Link>
-                </div>
-            </div>
-
-            <div className="space-y-12">
-                {sortedDays.length === 0 ? (
-                    <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-dashed border-gray-300">
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No activities planned yet</h3>
-                        <p className="text-gray-500 max-w-sm mx-auto">
-                            You haven't added any places to your itinerary. Start exploring places in {trip.city_name} to build your timeline!
-                        </p>
-                    </div>
-                ) : (
-                    sortedDays.map((day) => (
-                        <div key={day} className="relative">
-                            <div className="flex items-center mb-6">
-                                <div className="bg-primary-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-sm z-10">
-                                    {day}
-                                </div>
-                                <h2 className="text-2xl font-bold ml-4 text-gray-900">Day {day}</h2>
-                                <div className="flex-1 border-b-2 border-gray-100 ml-6"></div>
-                            </div>
-
-                            <div className="ml-5 border-l-2 border-gray-100 pl-8 space-y-6 pb-6 mt-[-1rem] pt-6 pr-2">
-                                {itemsByDay[day].sort((a, b) => a.time_slot.localeCompare(b.time_slot)).map((item, index) => (
-                                    <div
-                                        key={item.id}
-                                        className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative group slide-in-from-bottom-2 animate-in fade-in duration-300"
-                                        style={{ animationDelay: `${index * 100}ms` }}
-                                    >
-                                        <div className="absolute -left-[45px] top-6 bg-white border-2 border-primary-500 w-5 h-5 rounded-full z-10"></div>
-
-                                        <div className="flex justify-between items-start">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-2 text-sm font-medium text-primary-600">
-                                                    <Clock size={16} />
-                                                    {item.time_slot}
-                                                </div>
-                                                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                                    <MapPin size={18} className="text-gray-400" />
-                                                    {item.place_name}
-                                                </h3>
-                                                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                    {item.category_name}
-                                                </span>
-                                                <p className="text-gray-600 mt-3 text-sm leading-relaxed">
-                                                    {item.place_description}
-                                                </p>
-                                            </div>
-                                            <button className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-2">
-                                                <MoreVertical size={20} />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                    <div className="relative z-10 w-full flex flex-col md:flex-row justify-between items-center md:items-start gap-6">
+                        <div>
+                            <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
+                                Trip to {trip.city_name}
+                            </h1>
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 text-gray-600 font-medium mt-4">
+                                <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                                    <CalendarDays size={18} className="text-primary-500" />
+                                    {new Date(trip.start_date).toLocaleDateString()} &mdash; {new Date(trip.end_date).toLocaleDateString()}
+                                </span>
+                                <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                                    <span className="text-primary-500 font-bold">₹</span>
+                                    {trip.budget} Budget
+                                </span>
                             </div>
                         </div>
-                    ))
-                )}
+
+                        <div className="mt-6 md:mt-0 relative z-10 flex gap-3 justify-center md:self-end">
+                            <Link to={`/cities/${trip.city_id}`} className="bg-white border-2 border-primary-500 text-primary-600 px-5 py-2.5 rounded-lg font-medium hover:bg-primary-50 transition-colors shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                                Add Places
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-12">
+                    {sortedDays.length === 0 ? (
+                        <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-dashed border-gray-300">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No activities planned yet</h3>
+                            <p className="text-gray-500 max-w-sm mx-auto">
+                                You haven't added any places to your itinerary. Start exploring places in {trip.city_name} to build your timeline!
+                            </p>
+                        </div>
+                    ) : (
+                        sortedDays.map((day) => (
+                            <div key={day} className="relative">
+                                <div className="flex items-center mb-6">
+                                    <div className="bg-primary-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-sm z-10">
+                                        {day}
+                                    </div>
+                                    <h2 className="text-2xl font-bold ml-4 text-gray-900">Day {day}</h2>
+                                    <div className="flex-1 border-b-2 border-gray-100 ml-6"></div>
+                                </div>
+
+                                <div className="ml-5 border-l-2 border-gray-100 pl-8 space-y-6 pb-6 mt-[-1rem] pt-6 pr-2">
+                                    {itemsByDay[day].sort((a, b) => a.time_slot.localeCompare(b.time_slot)).map((item, index) => (
+                                        <div
+                                            key={item.id}
+                                            className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow relative group slide-in-from-bottom-2 animate-in fade-in duration-300"
+                                            style={{ animationDelay: `${index * 100}ms` }}
+                                        >
+                                            <div className="absolute -left-[45px] top-6 bg-white border-2 border-primary-500 w-5 h-5 rounded-full z-10"></div>
+
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-2 text-sm font-medium text-primary-600">
+                                                        <Clock size={16} />
+                                                        {item.time_slot}
+                                                    </div>
+                                                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                                        <MapPin size={18} className="text-gray-400" />
+                                                        {item.place_name}
+                                                    </h3>
+                                                    <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                        {item.category_name}
+                                                    </span>
+                                                    <p className="text-gray-600 mt-3 text-sm leading-relaxed">
+                                                        {item.place_description}
+                                                    </p>
+                                                </div>
+                                                <button className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-2">
+                                                    <MoreVertical size={20} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -1,0 +1,26 @@
+{
+  "countries": [
+    {
+      "country_code": "FR",
+      "country_name": "France"
+    },
+    {
+      "country_code": "IN",
+      "country_name": "India"
+    },
+    {
+      "country_code": "IT",
+      "country_name": "Italy"
+    },
+    {
+      "country_code": "JP",
+      "country_name": "Japan"
+    },
+    {
+      "country_code": "US",
+      "country_name": "United States"
+    }
+  ],
+  "cityCount": 25,
+  "placeCount": 75
+}

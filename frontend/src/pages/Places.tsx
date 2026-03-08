@@ -117,11 +117,13 @@ const Places: React.FC = () => {
             const res = await api.post('/favorites/toggle', { user_id: user.id, place_id: placeId });
 
             const newFavorites = new Set(favoriteIds);
+            const strPlaceId = String(placeId);
+
             if (res.data.isFavorite) {
-                newFavorites.add(placeId);
+                newFavorites.add(strPlaceId);
                 toast.success('Added to favorites!');
             } else {
-                newFavorites.delete(placeId);
+                newFavorites.delete(strPlaceId);
                 toast.success('Removed from favorites');
             }
             setFavoriteIds(newFavorites);
@@ -130,8 +132,9 @@ const Places: React.FC = () => {
             toast.error('Failed to update favorites. Ensure backend is running.');
             // Optimistic UI update for dev mode
             const newFavorites = new Set(favoriteIds);
-            if (newFavorites.has(placeId)) newFavorites.delete(placeId);
-            else newFavorites.add(placeId);
+            const strPlaceId = String(placeId);
+            if (newFavorites.has(strPlaceId)) newFavorites.delete(strPlaceId);
+            else newFavorites.add(strPlaceId);
             setFavoriteIds(newFavorites);
         }
     };
@@ -201,7 +204,7 @@ const Places: React.FC = () => {
                         >
                             {/* Favorite Button */}
                             <button
-                                onClick={(e) => handleToggleFavorite(e, place.id)}
+                                onClick={(e) => handleToggleFavorite(e, String(place.id))}
                                 className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-all shadow-sm"
                                 title="Save to favorites"
                             >
