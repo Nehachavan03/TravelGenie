@@ -6,7 +6,7 @@ const db = require("../db");
 router.get("/:country_code", (req, res) => {
   const countryCode = req.params.country_code;
 
-  const query = "SELECT city_id, name, pincode FROM cities WHERE country_code = ?";
+  const query = "SELECT city_id AS id, name, pincode FROM cities WHERE country_code = ?";
 
   db.query(query, [countryCode], (err, results) => {
     if (err) {

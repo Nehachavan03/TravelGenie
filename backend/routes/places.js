@@ -7,7 +7,7 @@ router.get("/:city_id", (req, res) => {
   const cityId = req.params.city_id;
 
   const query = `
-    SELECT p.place_id, p.name, p.description, p.address, c.category_name
+    SELECT p.place_id AS id, p.name, p.description, p.address, c.category_name
     FROM places p
     JOIN categories c ON p.category_id = c.category_id
     WHERE p.city_id = ?

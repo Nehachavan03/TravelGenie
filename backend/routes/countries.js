@@ -4,7 +4,7 @@ const db = require("../db");
 
 // GET all countries
 router.get("/", (req, res) => {
-  const query = "SELECT * FROM countries";
+  const query = "SELECT country_code AS code, country_name AS name FROM countries";
 
   db.query(query, (err, results) => {
     if (err) {

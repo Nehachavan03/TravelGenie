@@ -8,7 +8,7 @@ router.post("/", (req, res) => {
 
   if (!message) {
     return res.json({
-      reply: "Please ask something like '3 day trip in Paris'"
+      message: "Please ask something like '3 day trip in Paris'"
     });
   }
 
@@ -27,7 +27,7 @@ router.post("/", (req, res) => {
 
   db.query(cityQuery, (err, cities) => {
 
-    if (err) return res.status(500).json({ reply: "Database error" });
+    if (err) return res.status(500).json({ message: "Database error" });
 
     let city = null;
 
@@ -40,7 +40,7 @@ router.post("/", (req, res) => {
 
     if (!city) {
       return res.json({
-        reply: "Please mention a city like Paris, Mumbai, Tokyo etc."
+        message: "Please mention a city like Paris, Mumbai, Tokyo etc."
       });
     }
 
@@ -54,16 +54,16 @@ router.post("/", (req, res) => {
 
     db.query(placeQuery, [city.city_id, days * 3], (err, places) => {
 
-      if (err) return res.status(500).json({ reply: "Database error" });
+      if (err) return res.status(500).json({ message: "Database error" });
 
       if (places.length === 0) {
         return res.json({
-          reply: "No places found for that city."
+          message: "No places found for that city."
         });
       }
 
-      // create itinerary
-      let itinerary = [];
+      // create itinerary plan
+      let plan = [];
       let index = 0;
 
       for (let d = 1; d <= days; d++) {
@@ -71,20 +71,26 @@ router.post("/", (req, res) => {
         let dayPlan = [];
 
         for (let i = 0; i < 3 && index < places.length; i++) {
-          dayPlan.push(places[index]);
+          dayPlan.push({
+            time: `${10 + (index % 4)}:00 AM`,
+            name: places[index].name
+          });
           index++;
         }
 
-        itinerary.push({
-          day: d,
-          places: dayPlan
-        });
-
+        if (dayPlan.length > 0) {
+          plan.push({
+            day: d,
+            title: `Explore ${city.name}`,
+            description: `Discover the best spots in ${city.name}.`,
+            places: dayPlan
+          });
+        }
       }
 
       res.json({
-        reply: `Here is a ${days}-day travel plan for ${city.name}`,
-        itinerary
+        message: `Here is a ${days}-day travel plan for ${city.name}`,
+        plan
       });
 
     });
