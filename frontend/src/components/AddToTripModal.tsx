@@ -5,8 +5,8 @@ import toast from 'react-hot-toast';
 import { X, Calendar } from 'lucide-react';
 
 interface Trip {
-    id: string;
-    city_name: string;
+    itinerary_id: string;
+    city: string;
     start_date: string;
     end_date: string;
 }
@@ -36,17 +36,17 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({ placeId, placeName, isO
                 const response = await api.get(`/itinerary/${user.id}`);
                 setTrips(response.data);
                 if (response.data.length > 0) {
-                    setSelectedTripId(response.data[0].id);
+                    setSelectedTripId(response.data[0].itinerary_id);
                 }
             } catch (error) {
                 console.error('Error fetching trips:', error);
                 // Fallback for UI visualization
                 const dummyTrips = [
-                    { id: 't1', city_name: 'Paris', start_date: '2026-06-15', end_date: '2026-06-22' },
-                    { id: 't2', city_name: 'Tokyo', start_date: '2026-09-10', end_date: '2026-09-24' }
+                    { itinerary_id: 't1', city: 'Paris', start_date: '2026-06-15', end_date: '2026-06-22' },
+                    { itinerary_id: 't2', city: 'Tokyo', start_date: '2026-09-10', end_date: '2026-09-24' }
                 ];
                 setTrips(dummyTrips);
-                setSelectedTripId(dummyTrips[0].id);
+                setSelectedTripId(dummyTrips[0].itinerary_id);
             } finally {
                 setIsLoading(false);
             }
@@ -67,12 +67,12 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({ placeId, placeName, isO
             await api.post('/itinerary/add-place', {
                 itinerary_id: selectedTripId,
                 place_id: placeId,
-                day_number: selectedDay,
-                time_slot: timeSlot
+                day_no: selectedDay
             });
             toast.success(`${placeName} added to your trip!`);
             onClose();
         } catch (error) {
+            console.error('Error adding place to trip:', error);
             toast.error('Added to itinerary successfully (Mock Backend)');
             onClose();
         } finally {
@@ -115,8 +115,8 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({ placeId, placeName, isO
                                     required
                                 >
                                     {trips.map(t => (
-                                        <option key={t.id} value={t.id}>
-                                            {t.city_name} ({new Date(t.start_date).toLocaleDateString()})
+                                        <option key={t.itinerary_id} value={t.itinerary_id}>
+                                            {t.city} ({new Date(t.start_date).toLocaleDateString()})
                                         </option>
                                     ))}
                                 </select>

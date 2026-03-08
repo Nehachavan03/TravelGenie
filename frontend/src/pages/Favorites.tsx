@@ -24,7 +24,12 @@ const Favorites: React.FC = () => {
             try {
                 if (!user?.id) return;
                 const response = await api.get(`/favorites/${user.id}`);
-                setFavorites(response.data);
+                // Map place_id from backend to id for frontend
+                const mappedData = response.data.map((p: any) => ({
+                    ...p,
+                    id: p.place_id || p.id
+                }));
+                setFavorites(mappedData);
             } catch (error) {
                 console.error('Error fetching favorites:', error);
                 // Fallback for UI demonstration
@@ -49,11 +54,16 @@ const Favorites: React.FC = () => {
 
     const handleRemoveFavorite = async (placeId: string) => {
         try {
-            await api.post('/favorites/toggle', { place_id: placeId });
+            if (!user?.id) return;
+            await api.post('/favorites/toggle', { 
+                user_id: user.id, 
+                place_id: placeId 
+            });
             setFavorites(favorites.filter(f => f.id !== placeId));
             toast.success('Removed from favorites');
         } catch (error) {
-            toast.error('Failed to remove favorite directly. Removing from mock view.');
+            console.error('Error removing favorite:', error);
+            toast.error('Failed to remove favorite. Removing from local view only.');
             setFavorites(favorites.filter(f => f.id !== placeId));
         }
     };

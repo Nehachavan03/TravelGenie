@@ -3,12 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { Briefcase, Calendar, MapPin, Plus, X } from 'lucide-react';
+import { Briefcase, Calendar, MapPin, Plus, X, Trash2 } from 'lucide-react';
 
 interface Trip {
-    id: string;
-    city_id: string;
-    city_name: string;
+    itinerary_id: string;
+    city: string;
     start_date: string;
     end_date: string;
     budget: string;
@@ -39,18 +38,16 @@ const Dashboard: React.FC = () => {
                 // Mock data for UI demonstration
                 setTrips([
                     {
-                        id: 't1',
-                        city_id: 'c1',
-                        city_name: 'Paris',
+                        itinerary_id: 't1',
+                        city: 'Paris',
                         start_date: '2026-06-15',
                         end_date: '2026-06-22',
                         budget: 'Medium',
                         image_url: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&q=80&w=1000'
                     },
                     {
-                        id: 't2',
-                        city_id: 'c2',
-                        city_name: 'Tokyo',
+                        itinerary_id: 't2',
+                        city: 'Tokyo',
                         start_date: '2026-09-10',
                         end_date: '2026-09-24',
                         budget: 'High',
@@ -80,16 +77,32 @@ const Dashboard: React.FC = () => {
 
         setIsSubmitting(true);
         try {
+            // Map budget string to numeric value for database compatibility
+            let numericBudget = 5000; // Default to Medium
+            if (budget === 'Low') numericBudget = 1000;
+            if (budget === 'High') numericBudget = 10000;
+
             const payload = {
                 user_id: user?.id,
                 city_id: cityId,
                 start_date: startDate,
                 end_date: endDate,
-                budget
+                budget: numericBudget
             };
 
             const response = await api.post('/itinerary/create', payload);
-            setTrips([...trips, response.data]);
+            
+            // Construct a Trip object compatible with the state
+            const newTrip: Trip = {
+                itinerary_id: response.data.itinerary_id || `t${Date.now()}`,
+                city: cityId, // Use the name from the input
+                start_date: startDate,
+                end_date: endDate,
+                budget: budget,
+                image_url: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=1000'
+            };
+            
+            setTrips([...trips, newTrip]);
             setIsCreateModalOpen(false);
             resetForm();
             toast.success('Trip created successfully!');
@@ -99,9 +112,8 @@ const Dashboard: React.FC = () => {
 
             // Fallback for UI demonstration
             const newTrip: Trip = {
-                id: `t${Date.now()}`,
-                city_id: cityId,
-                city_name: cityId, // Mock name
+                itinerary_id: `t${Date.now()}`,
+                city: cityId,
                 start_date: startDate,
                 end_date: endDate,
                 budget,
@@ -112,6 +124,24 @@ const Dashboard: React.FC = () => {
             resetForm();
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleDeleteTrip = async (e: React.MouseEvent, id: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!window.confirm('Are you sure you want to delete this trip?')) return;
+
+        try {
+            await api.delete(`/itinerary/${id}`);
+            setTrips(trips.filter(t => t.itinerary_id !== id));
+            toast.success('Trip deleted successfully');
+        } catch (error) {
+            console.error('Error deleting trip:', error);
+            // Even if backend fails, allow removing from UI for demo/local feel
+            setTrips(trips.filter(t => t.itinerary_id !== id));
+            toast.success('Trip removed (Local)');
         }
     };
 
@@ -167,15 +197,23 @@ const Dashboard: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {trips.map((trip) => (
                         <Link
-                            key={trip.id}
-                            to={`/trips/${trip.id}`}
-                            className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col"
+                            key={trip.itinerary_id}
+                            to={`/trips/${trip.itinerary_id}`}
+                            className="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group flex flex-col relative"
                         >
+                            <button
+                                onClick={(e) => handleDeleteTrip(e, trip.itinerary_id)}
+                                className="absolute top-3 left-3 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full text-gray-400 hover:text-red-500 transition-all shadow-sm opacity-0 group-hover:opacity-100"
+                                title="Delete Trip"
+                            >
+                                <Trash2 size={16} />
+                            </button>
+
                             <div className="relative h-40 overflow-hidden bg-gray-200">
                                 {trip.image_url ? (
                                     <img
-                                        src={trip.image_url || `https://tse1.mm.bing.net/th?q=${encodeURIComponent(trip.city_name)}+city+landmark&w=800&h=600&c=7&rs=1&p=0`}
-                                        alt={trip.city_name}
+                                        src={trip.image_url || `https://tse1.mm.bing.net/th?q=${encodeURIComponent(trip.city)}+city+landmark&w=800&h=600&c=7&rs=1&p=0`}
+                                        alt={trip.city}
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                     />
                                 ) : (
@@ -184,12 +222,12 @@ const Dashboard: React.FC = () => {
                                     </div>
                                 )}
                                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-bold text-gray-700 shadow-sm">
-                                    {trip.budget} Budget
+                                    ₹ {trip.budget} Budget
                                 </div>
                             </div>
                             <div className="p-6">
                                 <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-primary-600 transition-colors">
-                                    Trip to {trip.city_name}
+                                    Trip to {trip.city}
                                 </h3>
                                 <div className="space-y-2 text-sm text-gray-600">
                                     <div className="flex items-center gap-2">

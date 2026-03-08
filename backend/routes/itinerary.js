@@ -142,4 +142,19 @@ router.get("/:user_id", (req, res) => {
 
 });
 
+
+// Delete itinerary
+// DELETE /itinerary/:id
+router.delete('/:id', (req, res) => {
+  const itineraryId = req.params.id;
+  const query = 'DELETE FROM itineraries WHERE itinerary_id = ?';
+  db.query(query, [itineraryId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Database error');
+    }
+    res.json({ message: 'Itinerary deleted' });
+  });
+});
+
 module.exports = router;

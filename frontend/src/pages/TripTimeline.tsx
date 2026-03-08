@@ -108,7 +108,7 @@ const TripTimeline: React.FC = () => {
                             {new Date(trip.start_date).toLocaleDateString()} &mdash; {new Date(trip.end_date).toLocaleDateString()}
                         </span>
                         <span className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
-                            <span className="text-primary-500 font-bold">$</span>
+                            <span className="text-primary-500 font-bold">₹</span>
                             {trip.budget} Budget
                         </span>
                     </div>

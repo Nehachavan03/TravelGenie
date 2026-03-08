@@ -1,3 +1,5 @@
+
+
 # ✈️ Travel Itinerary Planner
 
 A full-stack travel discovery and planning platform designed to help users explore destinations, save favorites, and create detailed day-by-day itineraries with the help of an AI-driven chatbot.
