@@ -1,0 +1,50 @@
+### Register User
+POST http://localhost:5000/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### Login User
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### --- DEMO USER TESTS ---
+
+### 1. Login with Demo User
+# Expected: Success message, JWT token, and user_id: 9
+POST http://localhost:5000/auth/login
+Content-Type: application/json
+
+{
+  "email": "demo@example.com",
+  "password": "password123"
+}
+
+### 2. Get Demo User's Itineraries
+# Expected: List containing the Mumbai trip (itinerary_id: 9)
+GET http://localhost:5000/itinerary/9
+
+### 3. Chatbot - Plan for Demo User
+POST http://localhost:5000/chatbot
+Content-Type: application/json
+
+{
+  "message": "I am the demo user, plan a 2 day trip to Tokyo"
+}
+
+### --- GENERAL TESTS ---
+
+### Get Cities by Country
+GET http://localhost:5000/cities/IN
+
+### Get Itinerary Details (Fix Verification)
+GET http://localhost:5000/itinerary/details/1

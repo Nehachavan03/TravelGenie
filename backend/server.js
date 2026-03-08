@@ -7,6 +7,10 @@ const citiesRoute = require("./routes/cities");
 const placesRoute = require("./routes/places");
 const reviewsRoute = require("./routes/reviews");
 const itineraryRoute = require("./routes/itinerary");
+const authRoutes = require("./routes/auth");
+const chatbotRoute = require("./routes/chatbot");
+const favoritesRoute = require("./routes/favorites");
+
 
 const app = express();
 
@@ -18,6 +22,9 @@ app.use("/cities", citiesRoute);
 app.use("/places",placesRoute)
 app.use("/reviews", reviewsRoute);
 app.use("/itinerary", itineraryRoute);
+app.use("/auth", authRoutes);
+app.use("/chatbot", chatbotRoute);
+app.use("/favorites", favoritesRoute);
 
 app.get("/", (req, res) => {
   res.send("Travel Planner API Running");

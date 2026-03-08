@@ -58,34 +58,6 @@ router.post("/add-place", (req, res) => {
 });
 
 
-// Get itineraries of a user
-// GET /itinerary/:user_id
-router.get("/:user_id", (req, res) => {
-
-  const userId = req.params.user_id;
-
-  const query = `
-    SELECT i.itinerary_id, i.start_date, i.end_date, i.budget,
-           c.name AS city
-    FROM itineraries i
-    JOIN cities c ON i.city_id = c.city_id
-    WHERE i.user_id = ?
-  `;
-
-  db.query(query, [userId], (err, results) => {
-
-    if (err) {
-      console.error(err);
-      res.status(500).send("Database error");
-    } else {
-      res.json(results);
-    }
-
-  });
-
-});
-
-
 // Get itinerary details
 // GET /itinerary/details/:itinerary_id
 router.get("/details/:itinerary_id", (req, res) => {
@@ -103,6 +75,34 @@ router.get("/details/:itinerary_id", (req, res) => {
   `;
 
   db.query(query, [itineraryId], (err, results) => {
+
+    if (err) {
+      console.error(err);
+      res.status(500).send("Database error");
+    } else {
+      res.json(results);
+    }
+
+  });
+
+});
+
+
+// Get itineraries of a user
+// GET /itinerary/:user_id
+router.get("/:user_id", (req, res) => {
+
+  const userId = req.params.user_id;
+
+  const query = `
+    SELECT i.itinerary_id, i.start_date, i.end_date, i.budget,
+           c.name AS city
+    FROM itineraries i
+    JOIN cities c ON i.city_id = c.city_id
+    WHERE i.user_id = ?
+  `;
+
+  db.query(query, [userId], (err, results) => {
 
     if (err) {
       console.error(err);
