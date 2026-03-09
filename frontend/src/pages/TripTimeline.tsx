@@ -86,6 +86,27 @@ const TripTimeline: React.FC = () => {
         </div>
     );
 
+    const handleDeletePlace = async (detailId: string) => {
+        if (!window.confirm('Are you sure you want to remove this place from your itinerary?')) return;
+
+        try {
+            await api.delete(`/itinerary/remove-place/${detailId}`);
+            toast.success('Place removed');
+
+            // Remove from local state
+            setTrip(prev => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    items: prev.items.filter(item => item.id !== detailId)
+                };
+            });
+        } catch (error) {
+            console.error('Error removing place:', error);
+            toast.error('Failed to remove place');
+        }
+    };
+
     // Group items by day
     const itemsByDay = trip.items.reduce((acc, item) => {
         if (!acc[item.day_number]) acc[item.day_number] = [];
@@ -116,12 +137,12 @@ const TripTimeline: React.FC = () => {
                         <h1 className="text-3xl font-black">Trip to {trip.city_name}</h1>
                     </div>
                 </div>
-                
+
                 <div className="p-8 lg:p-10 flex-1 flex flex-col justify-between relative bg-white">
                     <div className="absolute top-0 right-0 p-10 opacity-5 transform translate-x-4 -translate-y-4 pointer-events-none hidden lg:block">
                         <MapIcon size={160} />
                     </div>
-                    
+
                     <div className="relative z-10">
                         <div className="hidden lg:block mb-4">
                             <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
@@ -145,13 +166,13 @@ const TripTimeline: React.FC = () => {
                     </div>
 
                     <div className="mt-10 flex flex-wrap gap-4 items-center">
-                        <Link 
-                            to={`/cities/${trip.city_id}`} 
+                        <Link
+                            to={`/cities/${trip.city_id}`}
                             className="flex-1 lg:flex-none text-center bg-primary-600 text-white px-8 py-3.5 rounded-2xl font-black shadow-lg shadow-primary-200 hover:bg-primary-700 hover:-translate-y-0.5 transition-all"
                         >
                             + Add More Places
                         </Link>
-                        <button 
+                        <button
                             onClick={() => window.print()}
                             className="flex-1 lg:flex-none text-center bg-white border-2 border-gray-200 text-gray-700 px-8 py-3.5 rounded-2xl font-black hover:bg-gray-50 transition-all"
                         >
@@ -213,18 +234,18 @@ const TripTimeline: React.FC = () => {
                                                         {item.category_name}
                                                     </span>
                                                 </div>
-                                                
+
                                                 <h3 className="text-2xl font-black text-gray-900 mb-3 flex items-center gap-2">
                                                     {item.place_name}
                                                 </h3>
-                                                
+
                                                 <p className="text-gray-500 font-medium leading-relaxed max-w-2xl">
                                                     {item.place_description}
                                                 </p>
                                             </div>
-                                            
+
                                             <div className="flex items-center md:items-start">
-                                                <button className="bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 p-3 rounded-2xl transition-all duration-200">
+                                                <button onClick={() => handleDeletePlace(item.id)} className="bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 p-3 rounded-2xl transition-all duration-200">
                                                     <Trash2 size={20} />
                                                 </button>
                                             </div>
@@ -242,15 +263,15 @@ const TripTimeline: React.FC = () => {
 
 // Missing import fix
 const Trash2 = ({ size }: { size: number }) => (
-    <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width={size} 
-        height={size} 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
         strokeLinejoin="round"
     >
         <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 9v-4m4 4v-4" />

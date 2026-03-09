@@ -86,7 +86,7 @@ const Home: React.FC = () => {
                         Design Your Dream <span className="text-primary-200">Journey</span>
                     </h1>
                     <p className="mt-4 text-xl md:text-2xl text-primary-50 max-w-3xl">
-                        Discover breathtaking destinations, organize your itinerary, and make unforgettable memories with our smart travel planner.
+                        Discover breathtaking destinations, organize your itinerary, and make unforgettable memories with TravelGenie.
                     </p>
                 </div>
             </section>

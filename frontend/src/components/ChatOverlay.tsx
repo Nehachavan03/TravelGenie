@@ -20,7 +20,7 @@ const ChatOverlay: React.FC = () => {
         {
             id: 'm1',
             role: 'assistant',
-            content: "Hi! I'm your AI Travel Planner. Tell me where you're going and what you like, and I'll suggest a custom itinerary!"
+            content: "Hi! I'm VoyageAI, your personal travel assistant. Tell me where you're going and what you like, and I'll suggest a custom itinerary!"
         }
     ]);
     const [input, setInput] = useState('');

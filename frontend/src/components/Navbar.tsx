@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
                     <div className="flex items-center">
                         <Link to="/" className="flex-shrink-0 flex items-center gap-2 hover:opacity-80 transition-opacity">
                             <Map className="h-8 w-8 text-white" />
-                            <span className="font-bold text-xl tracking-tight hidden sm:block">TravelPlanner</span>
+                            <span className="font-bold text-xl tracking-tight hidden sm:block">TravelGenie</span>
                         </Link>
                     </div>
 
@@ -28,7 +28,7 @@ const Navbar: React.FC = () => {
                             <>
                                 <Link to="/smart-planner" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-500 transition-colors flex items-center gap-1.5 text-primary-50">
                                     <Sparkles size={18} className="text-yellow-300" />
-                                    <span className="hidden lg:inline">AI Planner</span>
+                                    <span className="hidden lg:inline">VoyageAI</span>
                                 </Link>
                                 <Link to="/favorites" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-500 transition-colors flex items-center gap-1">
                                     <Heart size={18} />
