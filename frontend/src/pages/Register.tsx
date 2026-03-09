@@ -38,16 +38,18 @@ const Register: React.FC = () => {
             if (registerResponse.data.token && registerResponse.data.user) {
                 login(registerResponse.data.token, registerResponse.data.user);
                 toast.success('Registration successful!');
-                navigate('/');
+                setTimeout(() => navigate('/'), 500);
             } else {
                 // Fallback to manual login if register doesn't auto-return token
                 const loginResponse = await api.post('/auth/login', { email, password });
                 login(loginResponse.data.token, loginResponse.data.user);
                 toast.success('Registration successful!');
-                navigate('/');
+                setTimeout(() => navigate('/'), 500);
             }
         } catch (error: any) {
             console.error('Registration error:', error);
+            setPassword('');
+            setConfirmPassword('');
             toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
         } finally {
             setIsLoading(false);

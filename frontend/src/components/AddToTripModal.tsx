@@ -83,11 +83,11 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({ placeId, placeName, isO
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm" onClick={onClose}>
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200" onClick={(e) => e.stopPropagation()}>
                 <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
                     <h2 className="text-lg font-bold text-gray-900">Add to Trip</h2>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1">
+                    <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1">
                         <X size={20} />
                     </button>
                 </div>
@@ -101,8 +101,17 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({ placeId, placeName, isO
                     {isLoading ? (
                         <div className="h-10 bg-gray-100 animate-pulse rounded-lg w-full mb-4"></div>
                     ) : trips.length === 0 ? (
-                        <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
-                            You must create a trip first before adding places.
+                        <div className="flex flex-col gap-3">
+                            <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100">
+                                You must create a trip first before adding places.
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="w-full py-2 px-4 shadow-sm border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                            >
+                                Close
+                            </button>
                         </div>
                     ) : (
                         <>
