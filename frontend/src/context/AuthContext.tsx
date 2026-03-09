@@ -29,10 +29,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
 
     const login = (newToken: string, userData: User) => {
+        // Normalize: ensures both id and user_id are present for compatibility
+        const normalizedUser = {
+            ...userData,
+            id: userData.id || userData.user_id,
+            user_id: userData.user_id || userData.id
+        };
+        console.log('Logging in user:', normalizedUser);
         setToken(newToken);
-        setUser(userData);
+        setUser(normalizedUser);
         localStorage.setItem('token', newToken);
-        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('user', JSON.stringify(normalizedUser));
     };
 
     const logout = () => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, Map, Heart } from 'lucide-react';
+import { LogOut, Map, Heart, Sparkles } from 'lucide-react';
 
 const Navbar: React.FC = () => {
     const { isAuthenticated, user, logout } = useAuth();
@@ -23,9 +23,13 @@ const Navbar: React.FC = () => {
                         </Link>
                     </div>
 
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2 sm:space-x-4">
                         {isAuthenticated ? (
                             <>
+                                <Link to="/smart-planner" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-500 transition-colors flex items-center gap-1.5 text-primary-50">
+                                    <Sparkles size={18} className="text-yellow-300" />
+                                    <span className="hidden lg:inline">AI Planner</span>
+                                </Link>
                                 <Link to="/favorites" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-primary-500 transition-colors flex items-center gap-1">
                                     <Heart size={18} />
                                     <span className="hidden sm:inline">Favorites</span>

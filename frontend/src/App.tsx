@@ -15,6 +15,7 @@ import Places from './pages/Places';
 import Favorites from './pages/Favorites';
 import Dashboard from './pages/Dashboard';
 import TripTimeline from './pages/TripTimeline';
+import SmartPlanner from './pages/SmartPlanner';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
             <Route path="/countries/:country_code" element={<Cities />} />
             <Route path="/cities/:id" element={<Places />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/smart-planner" element={<SmartPlanner />} />
             <Route path="/trips/:id" element={<TripTimeline />} />
             <Route path="/favorites" element={<Favorites />} />
           </Route>

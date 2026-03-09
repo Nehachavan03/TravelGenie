@@ -25,6 +25,7 @@ app.use("/itinerary", itineraryRoute);
 app.use("/auth", authRoutes);
 app.use("/chatbot", chatbotRoute);
 app.use("/favorites", favoritesRoute);
+app.use("/ai", require("./routes/ai_planner"));
 
 app.get("/", (req, res) => {
   res.send("Travel Planner API Running");

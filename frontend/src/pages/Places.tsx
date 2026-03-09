@@ -32,9 +32,13 @@ const Places: React.FC = () => {
 
     useEffect(() => {
         const fetchPlaces = async () => {
+            setIsLoading(true);
             try {
                 const response = await api.get(`/places/${city_id}`);
-                const data = response.data;
+                const data = response.data.map((p: any) => ({
+                    ...p,
+                    id: (p.place_id || p.id).toString()
+                }));
                 setPlaces(data);
                 setFilteredPlaces(data);
 
@@ -46,7 +50,7 @@ const Places: React.FC = () => {
                 if (user?.id) {
                     try {
                         const favRes = await api.get(`/favorites/${user.id}`);
-                        const fIds = new Set<string>(favRes.data.map((f: any) => f.place_id.toString()));
+                        const fIds = new Set<string>(favRes.data.map((f: any) => (f.place_id || f.id).toString()));
                         setFavoriteIds(fIds);
                     } catch (e) {
                         console.error('Error fetching favorites', e);
@@ -95,7 +99,7 @@ const Places: React.FC = () => {
         if (city_id) {
             fetchPlaces();
         }
-    }, [city_id]);
+    }, [city_id, user]);
 
     const handleCategoryFilter = (category: string) => {
         setActiveCategory(category);
@@ -113,29 +117,31 @@ const Places: React.FC = () => {
             return;
         }
 
+        console.log('Toggling favorite:', { userId: user.id, placeId });
+
         try {
             const res = await api.post('/favorites/toggle', { user_id: user.id, place_id: placeId });
+            console.log('Favorite toggle response:', res.data);
 
-            const newFavorites = new Set(favoriteIds);
             const strPlaceId = String(placeId);
-
-            if (res.data.isFavorite) {
-                newFavorites.add(strPlaceId);
-                toast.success('Added to favorites!');
-            } else {
-                newFavorites.delete(strPlaceId);
-                toast.success('Removed from favorites');
-            }
-            setFavoriteIds(newFavorites);
-        } catch (error) {
-            console.error(error);
-            toast.error('Failed to update favorites. Ensure backend is running.');
-            // Optimistic UI update for dev mode
-            const newFavorites = new Set(favoriteIds);
-            const strPlaceId = String(placeId);
-            if (newFavorites.has(strPlaceId)) newFavorites.delete(strPlaceId);
-            else newFavorites.add(strPlaceId);
-            setFavoriteIds(newFavorites);
+            setFavoriteIds(prev => {
+                const newFavorites = new Set(prev);
+                if (res.data.isFavorite) {
+                    newFavorites.add(strPlaceId);
+                    toast.success('Added to favorites!');
+                } else {
+                    newFavorites.delete(strPlaceId);
+                    toast.success('Removed from favorites');
+                }
+                return newFavorites;
+            });
+        } catch (error: any) {
+            console.error('Failed to update favorite details:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
+            toast.error('Failed to update favorites');
         }
     };
 

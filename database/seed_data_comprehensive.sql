@@ -1,5 +1,6 @@
 USE travel_planner;
 
+
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE itinerary_details;
 TRUNCATE TABLE favorites;
