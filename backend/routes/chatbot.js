@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-router.post("/", (req, res) => {
-
+router.post("/", async (req, res) => {
   const { message } = req.body;
 
   if (!message) {
@@ -12,91 +11,58 @@ router.post("/", (req, res) => {
     });
   }
 
-  const msg = message.toLowerCase();
-
-  // detect number of days
-  let days = 1;
-
-  const dayMatch = msg.match(/\d+/);
-  if (dayMatch) {
-    days = parseInt(dayMatch[0]);
-  }
-
-  // detect city
-  const cityQuery = "SELECT city_id, name FROM cities";
-
-  db.query(cityQuery, (err, cities) => {
-
-    if (err) return res.status(500).json({ message: "Database error" });
-
-    let city = null;
-
-    for (let c of cities) {
-      if (msg.includes(c.name.toLowerCase())) {
-        city = c;
-        break;
-      }
-    }
-
-    if (!city) {
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      console.warn("GEMINI_API_KEY is missing. Using fallback response.");
       return res.json({
-        message: "Please mention a city like Paris, Mumbai, Tokyo etc."
+        message: "I'm your AI Travel Planner! Be sure to add your GEMINI_API_KEY to see my real capabilities."
       });
     }
 
-    // fetch places
-    const placeQuery = `
-      SELECT name, description, address
-      FROM places
-      WHERE city_id = ?
-      LIMIT ?
-    `;
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    db.query(placeQuery, [city.city_id, days * 3], (err, places) => {
-
-      if (err) return res.status(500).json({ message: "Database error" });
-
-      if (places.length === 0) {
-        return res.json({
-          message: "No places found for that city."
-        });
+    // We use gemini-2.5-flash and force it to output structured JSON
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
       }
-
-      // create itinerary plan
-      let plan = [];
-      let index = 0;
-
-      for (let d = 1; d <= days; d++) {
-
-        let dayPlan = [];
-
-        for (let i = 0; i < 3; i++) {
-          dayPlan.push({
-            time: `${10 + (i % 4)}:00 AM`,
-            name: places[index % places.length].name
-          });
-          index++;
-        }
-
-        if (dayPlan.length > 0) {
-          plan.push({
-            day: d,
-            title: `Explore ${city.name}`,
-            description: `Discover the best spots in ${city.name}.`,
-            places: dayPlan
-          });
-        }
-      }
-
-      res.json({
-        message: `Here is a ${days}-day travel plan for ${city.name}`,
-        plan
-      });
-
     });
 
-  });
+    const prompt = `You are a helpful and enthusiastic AI Travel Assistant. The user said: "${message}"
 
+Respond with a JSON object exactly matching this schema:
+{
+  "message": "A conversational response acknowledging the request and providing a helpful reply.",
+  "plan": [ 
+    {
+      "day": 1,
+      "title": "A short, catchy title for the day",
+      "description": "A brief description of the day's theme",
+      "places": [
+        { "time": "09:00 AM", "name": "Name of the place or activity" }
+      ]
+    }
+  ]
+}
+
+Note: The "plan" array is optional and should ONLY be included if the user is asking for an itinerary or a trip plan. If they just say "hi", "plan" can be omitted. Make the itinerary highly realistic, with famous or interesting real-world places. Add roughly 3-4 places per day with logical times.`;
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+
+    try {
+      const parsedData = JSON.parse(responseText);
+      res.json(parsedData);
+    } catch (parseError) {
+      console.error('Failed to parse Gemini JSON:', responseText);
+      res.json({ message: "I'm sorry, I couldn't formulate a proper response to that. Could you try rephrasing?" });
+    }
+
+  } catch (error) {
+    console.error('Chatbot AI Error:', error);
+    res.status(500).json({ message: "AI service error" });
+  }
 });
 
 module.exports = router;

@@ -1,45 +1,54 @@
 const express = require('express');
- const router = express.Router();
-     // const { GoogleGenerativeAI } = require("@google/generative-ai"); // Uncomment if using Gemini
-     // const OpenAI = require("openai"); // Uncomment if using OpenAI
-    
-     // Initialize AI (Example for Gemini)
-     // const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    
-     router.post('/plan', async (req, res) => {
-        const { city, days, budget, interests } = req.body;
-   
-        try {
-            // Construct the prompt
-            const prompt = `Plan a ${days}-day trip to ${city} with a ${budget} budget.
-                            User interests: ${interests.join(', ')}.
-                            Provide a day-by-day itinerary with morning, afternoon, and evening activities.`;     
-   
-            // Call AI API here
-            // const model = genAI.getGenerativeModel({ model: "gemini-pro"});
-            // const result = await model.generateContent(prompt);
-            // const response = await result.response;
-            // const text = response.text();
-   
-            // MOCK RESPONSE (Remove this when you have an API key)
-            const text = `Day 1: Explore ${city} City Center...\nDay 2: Visit the famous museums...`;
-   
-            res.json({ itinerary: text });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send("AI Error");
-        }
-   
-   
-   
-    });
+const router = express.Router();
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+router.post('/plan', async (req, res) => {
+  const { city, days, budget, interests } = req.body;
+
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      console.warn("GEMINI_API_KEY is missing. Using fallback response.");
+      const text = `Day 1: Arrival in ${city}. Morning coffee at a local cafe. Visit the historic city center and enjoy a traditional lunch. Evening walk by the river.\n\nDay 2: Full day exploring local museums and art galleries. Optional shopping at the main district.\n\nDay 3: Nature day! Visit the botanical gardens or a nearby park. Farewell dinner at a top-rated restaurant.`;
+      return res.json({ itinerary: text });
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+    // Construct the prompt
+    const prompt = `Plan a ${days}-day trip to ${city} with a ${budget} budget.
+                        User interests: ${interests.join(', ')}.
+                        Provide a brief day-by-day itinerary with morning, afternoon, and evening activities. Keep the response clean and well-formatted. Focus only on the itinerary steps. Do not include introductory text.`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    res.json({ itinerary: text });
+  } catch (error) {
+    console.error("AI Planner Error:", error);
+    res.status(500).json({ message: "Error generating the AI itinerary" });
+  }
+});
+
 router.post('/recommend', async (req, res) => {
   const { favorites } = req.body;
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      const text = 'Since you like ' + (favorites[0] || 'beautiful places') + ', you might love visiting Kyoto for its temples or Swiss Alps for nature!';
+      return res.json({ recommendations: text });
+    }
+
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
     const prompt = 'Based on these favorite places: ' + favorites.join(', ') + ', recommend 3 similar destinations or activities world-wide. Provide brief reasons why.';
-    const text = 'Since you like ' + favorites[0] + ', you might love visiting Kyoto for its temples or Swiss Alps for nature!';
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
     res.json({ recommendations: text });
   } catch (error) {
+    console.error("AI Recommend Error:", error);
     res.status(500).send('AI Error');
   }
 });
