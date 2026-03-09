@@ -10,7 +10,7 @@ interface Review {
     place_id: string;
     rating: number;
     comment: string;
-    created_at: string;
+    review_date: string;
 }
 
 interface ReviewSectionProps {
@@ -42,7 +42,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId }) => {
                         place_id: placeId,
                         rating: 5,
                         comment: 'Absolutely breathtaking! The views were incredible and the experience was once in a lifetime. Highly recommend going early to beat the crowds.',
-                        created_at: new Date().toISOString(),
+                        review_date: new Date().toISOString(),
                     },
                     {
                         id: 'r2',
@@ -50,7 +50,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId }) => {
                         place_id: placeId,
                         rating: 4,
                         comment: 'Great spot but a bit crowded. Make sure you book tickets in advance.',
-                        created_at: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
+                        review_date: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
                     }
                 ]);
             } finally {
@@ -96,7 +96,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId }) => {
                 place_id: placeId,
                 rating,
                 comment,
-                created_at: new Date().toISOString()
+                review_date: new Date().toISOString()
             }, ...reviews]);
             setComment('');
         } finally {
@@ -189,7 +189,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({ placeId }) => {
                                     <div>
                                         <p className="font-semibold text-gray-900">{review.user_name}</p>
                                         <p className="text-xs text-gray-500">
-                                            {new Date(review.created_at).toLocaleDateString()}
+                                            {new Date(review.review_date).toLocaleDateString()}
                                         </p>
                                     </div>
                                 </div>
