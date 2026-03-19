@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { X, Calendar } from 'lucide-react';
+import { X, Calendar, Edit3 } from 'lucide-react';
 
 interface Trip {
     itinerary_id: string;
@@ -23,7 +23,7 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({ placeId, placeName, isO
     const [trips, setTrips] = useState<Trip[]>([]);
     const [selectedTripId, setSelectedTripId] = useState('');
     const [selectedDay, setSelectedDay] = useState<number>(1);
-    const [timeSlot, setTimeSlot] = useState('10:00 AM');
+    const [notes, setNotes] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -67,7 +67,8 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({ placeId, placeName, isO
             await api.post('/itinerary/add-place', {
                 itinerary_id: selectedTripId,
                 place_id: placeId,
-                day_no: selectedDay
+                day_no: selectedDay,
+                notes: notes
             });
             toast.success(`${placeName} added to your trip!`);
             onClose();
@@ -144,16 +145,18 @@ const AddToTripModal: React.FC<AddToTripModalProps> = ({ placeId, placeName, isO
                                         required
                                     />
                                 </div>
-                                <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
-                                    <input
-                                        type="time"
-                                        value={timeSlot}
-                                        onChange={(e) => setTimeSlot(e.target.value)}
-                                        className="w-full rounded-lg border-gray-300 border px-3 py-2 text-gray-900 focus:ring-primary-500 text-sm"
-                                        required
-                                    />
-                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1.5">
+                                    <Edit3 size={14} /> Notes (Personalize your trip)
+                                </label>
+                                <textarea
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    placeholder="Enter details like time, description, or why you want to visit..."
+                                    className="w-full rounded-lg border-gray-300 border px-3 py-2 text-gray-900 focus:ring-primary-500 text-sm h-24 resize-none"
+                                />
                             </div>
 
                             <div className="pt-2">

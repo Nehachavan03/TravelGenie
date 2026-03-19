@@ -20,11 +20,23 @@ const ChatOverlay: React.FC = () => {
         {
             id: 'm1',
             role: 'assistant',
-            content: "Hi! I'm VoyageAI, your personal travel assistant. Tell me where you're going and what you like, and I'll suggest a custom itinerary!"
+            content: "Hi! I'm VoyageAI, your personal travel assistant. Please ask questions like how to use the app or plan a 1 day trip!"
         }
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+
+    const quickQuestions = [
+        "How to login?",
+        "How to use the app?",
+        "How to use the features?",
+        "Plan a 1 day trip"
+    ];
+
+    const handleQuickQuestion = (q: string) => {
+        setInput(q);
+        // We can optionally submit immediately
+    };
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -211,6 +223,21 @@ const ChatOverlay: React.FC = () => {
 
                         <div ref={messagesEndRef} />
                     </div>
+
+                    {/* Quick Questions */}
+                    {!isTyping && messages.length < 3 && (
+                        <div className="px-5 py-2 flex flex-wrap gap-2 bg-slate-50">
+                            {quickQuestions.map((q, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => handleQuickQuestion(q)}
+                                    className="text-[10px] font-bold bg-white border border-primary-200 text-primary-700 px-2 py-1 rounded-lg hover:bg-primary-50 transition-colors shadow-sm"
+                                >
+                                    {q}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Input Area */}
                     <div className="p-3 bg-white border-t border-gray-100">

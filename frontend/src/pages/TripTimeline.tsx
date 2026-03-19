@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
-import { ArrowLeft, Clock, MapPin, Map as MapIcon, CalendarDays, MoreVertical, Compass } from 'lucide-react';
+import { ArrowLeft, Edit3, MapPin, Map as MapIcon, CalendarDays, MoreVertical, Compass } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface ItineraryItem {
     id: string;
     day_number: number;
-    time_slot: string;
+    time_slot: string; // Back-end still returns this as the field name for notes
     place_name: string;
     place_description: string;
     category_name: string;
@@ -46,11 +46,11 @@ const TripTimeline: React.FC = () => {
                     end_date: '2026-06-22',
                     budget: 'Medium',
                     items: [
-                        { id: 'i1', day_number: 1, time_slot: '09:00 AM', place_name: 'Eiffel Tower', category_name: 'Historical', place_description: 'Visit the landmark tower early morning.' },
-                        { id: 'i2', day_number: 1, time_slot: '01:00 PM', place_name: 'Le Jules Verne', category_name: 'Dining', place_description: 'Lunch at the second floor of Eiffel Tower.' },
-                        { id: 'i3', day_number: 1, time_slot: '03:30 PM', place_name: 'Seine River Cruise', category_name: 'Experience', place_description: 'Afternoon boat tour.' },
-                        { id: 'i4', day_number: 2, time_slot: '10:00 AM', place_name: 'Louvre Museum', category_name: 'Museum', place_description: 'Explore the world\'s largest art museum.' },
-                        { id: 'i5', day_number: 2, time_slot: '04:00 PM', place_name: 'Notre-Dame Cathedral', category_name: 'Historical', place_description: 'Walk around the iconic cathedral.' },
+                        { id: 'i1', day_number: 1, time_slot: 'Early morning visit', place_name: 'Eiffel Tower', category_name: 'Historical', place_description: 'Visit the landmark tower early morning.' },
+                        { id: 'i2', day_number: 1, time_slot: 'Lunch with a view', place_name: 'Le Jules Verne', category_name: 'Dining', place_description: 'Lunch at the second floor of Eiffel Tower.' },
+                        { id: 'i3', day_number: 1, time_slot: 'Relaxing afternoon', place_name: 'Seine River Cruise', category_name: 'Experience', place_description: 'Afternoon boat tour.' },
+                        { id: 'i4', day_number: 2, time_slot: 'Art exploration', place_name: 'Louvre Museum', category_name: 'Museum', place_description: 'Explore the world\'s largest art museum.' },
+                        { id: 'i5', day_number: 2, time_slot: 'Historic walk', place_name: 'Notre-Dame Cathedral', category_name: 'Historical', place_description: 'Walk around the iconic cathedral.' },
                     ]
                 });
             } finally {
@@ -225,19 +225,22 @@ const TripTimeline: React.FC = () => {
 
                                         <div className="flex flex-col md:flex-row justify-between gap-6">
                                             <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-4">
-                                                    <div className="flex items-center gap-1.5 bg-primary-50 text-primary-700 px-3 py-1 rounded-xl text-xs font-black">
-                                                        <Clock size={14} />
-                                                        {item.time_slot}
-                                                    </div>
+                                                <div className="flex items-center gap-3 mb-2">
                                                     <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-xl text-xs font-black">
                                                         {item.category_name}
                                                     </span>
                                                 </div>
 
-                                                <h3 className="text-2xl font-black text-gray-900 mb-3 flex items-center gap-2">
+                                                <h3 className="text-2xl font-black text-gray-900 mb-1 flex items-center gap-2">
                                                     {item.place_name}
                                                 </h3>
+
+                                                {item.time_slot && (
+                                                    <div className="flex items-start gap-1.5 text-primary-600 mb-4 font-bold text-sm">
+                                                        <Edit3 size={14} className="mt-0.5 flex-shrink-0" />
+                                                        <p className="italic leading-tight">Note: {item.time_slot}</p>
+                                                    </div>
+                                                )}
 
                                                 <p className="text-gray-500 font-medium leading-relaxed max-w-2xl">
                                                     {item.place_description}
