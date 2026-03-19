@@ -43,10 +43,9 @@ const Login: React.FC = () => {
     const handleGuestLogin = async () => {
         setIsLoading(true);
         try {
-            // Using a demo account or a dedicated guest endpoint
-            const response = await api.post('/auth/login', { 
-                email: 'guest@example.com', 
-                password: 'guestpassword123' 
+            const response = await api.post('/auth/login', {
+                email: 'guest@example.com',
+                password: 'guestpassword123'
             });
 
             const { token, user } = response.data;
@@ -92,13 +91,14 @@ const Login: React.FC = () => {
                                     type="email"
                                     autoComplete="email"
                                     required
-                                    className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm transition-colors"
+                                    className="appearance-none rounded-lg w-full px-3 py-3 pl-10 border border-gray-300 focus:ring-2 focus:ring-primary-500"
                                     placeholder="Email address"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
                         </div>
+
                         <div>
                             <label htmlFor="password" className="sr-only">Password</label>
                             <div className="relative">
@@ -111,7 +111,7 @@ const Login: React.FC = () => {
                                     type="password"
                                     autoComplete="current-password"
                                     required
-                                    className="appearance-none rounded-lg relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:z-10 sm:text-sm transition-colors"
+                                    className="appearance-none rounded-lg w-full px-3 py-3 pl-10 border border-gray-300 focus:ring-2 focus:ring-primary-500"
                                     placeholder="Password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -124,7 +124,9 @@ const Login: React.FC = () => {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white ${isLoading ? 'bg-primary-400 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all shadow-md hover:shadow-lg`}
+                            className={`w-full py-3 px-4 text-white rounded-lg ${
+                                isLoading ? 'bg-gray-400' : 'bg-primary-600 hover:bg-primary-700'
+                            }`}
                         >
                             {isLoading ? 'Signing in...' : 'Sign in'}
                         </button>
@@ -133,26 +135,16 @@ const Login: React.FC = () => {
                             type="button"
                             onClick={handleGuestLogin}
                             disabled={isLoading}
-                            className="w-full flex justify-center py-3 px-4 border-2 border-primary-600 text-sm font-bold rounded-lg text-primary-600 bg-white hover:bg-primary-50 transition-all shadow-sm"
+                            className="w-full py-3 px-4 border-2 border-primary-600 text-primary-600 rounded-lg"
                         >
-                            Guest Access (One Click)
+                            Guest Access
                         </button>
                     </div>
                 </form>
 
                 <div className="text-center mt-4 text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500 transition-colors">
-                        Sign up now
-                    </Link>
-                </div>
-            </div>
-        </div>
-    );
-
-                <div className="text-center mt-4 text-sm text-gray-600">
-                    Don't have an account?{' '}
-                    <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500 transition-colors">
+                    <Link to="/register" className="text-primary-600">
                         Sign up now
                     </Link>
                 </div>
