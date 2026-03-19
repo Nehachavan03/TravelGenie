@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
-import { ArrowLeft, Edit3, MapPin, Map as MapIcon, CalendarDays, MoreVertical, Compass } from 'lucide-react';
+import { ArrowLeft, Edit3, MapPin, Map as MapIcon, CalendarDays, Compass } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface ItineraryItem {

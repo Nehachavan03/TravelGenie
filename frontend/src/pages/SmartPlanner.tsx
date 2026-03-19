@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import api from '../services/api';
-import { Sparkles, Send, Calendar, MapPin, Wallet, Coffee, Plane, Loader2, Coins, TrendingUp } from 'lucide-react';
+import { Sparkles, Send, Calendar, MapPin, Coffee, Plane, Loader2, TrendingUp } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const SmartPlanner: React.FC = () => {
