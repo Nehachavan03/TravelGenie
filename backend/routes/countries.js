@@ -8,8 +8,13 @@ router.get("/", (req, res) => {
 
   db.query(query, (err, results) => {
     if (err) {
-      console.error(err);
-      res.status(500).send("Database error");
+      console.error("Error fetching countries:", err);
+      // Send back the specific error message to help debug during development/deployment
+      res.status(500).json({ 
+        message: "Database error fetching countries", 
+        error: err.message,
+        code: err.code
+      });
     } else {
       res.json(results);
     }

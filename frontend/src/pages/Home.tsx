@@ -38,10 +38,12 @@ const Home: React.FC = () => {
             try {
                 const response = await api.get('/countries');
                 setCountries(response.data);
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Error fetching countries:', error);
+                const errorMsg = error.response?.data?.error || error.message || 'Unknown error';
+                console.error('Backend error details:', errorMsg);
                 // Fallback for UI demonstration if backend is down
-                toast.error('Could not load destinations. Showing featured destinations instead.');
+                toast.error(`Could not load destinations: ${errorMsg}. Showing featured destinations instead.`);
                 setCountries([
                     {
                         code: 'FR',
