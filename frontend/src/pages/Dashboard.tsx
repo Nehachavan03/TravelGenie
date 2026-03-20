@@ -41,7 +41,27 @@ const Dashboard: React.FC = () => {
                 setTrips(response.data);
             } catch (error) {
                 console.error('Error fetching trips:', error);
-                toast.error('Could not load trips.');
+                toast.error('Could not load trips. Showing sample trips instead.');
+                
+                // Fallback mock data for exploration
+                setTrips([
+                    {
+                        itinerary_id: '1',
+                        city: 'Paris',
+                        start_date: '2025-06-10',
+                        end_date: '2025-06-12',
+                        budget: 'High',
+                        image_url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=1000'
+                    },
+                    {
+                        itinerary_id: '2',
+                        city: 'Mumbai',
+                        start_date: '2025-12-25',
+                        end_date: '2025-12-28',
+                        budget: 'Medium',
+                        image_url: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&q=80&w=1000'
+                    }
+                ]);
             } finally {
                 setIsLoading(false);
             }
