@@ -35,24 +35,7 @@ const TripTimeline: React.FC = () => {
                 setTrip(response.data);
             } catch (error) {
                 console.error('Error fetching itinerary details:', error);
-                toast.error('Could not load itinerary. Showing mock data.');
-
-                // Mock data for UI 
-                setTrip({
-                    id: id || 't1',
-                    city_id: '1',
-                    city_name: 'Paris',
-                    start_date: '2026-06-15',
-                    end_date: '2026-06-22',
-                    budget: 'Medium',
-                    items: [
-                        { id: 'i1', day_number: 1, time_slot: 'Early morning visit', place_name: 'Eiffel Tower', category_name: 'Historical', place_description: 'Visit the landmark tower early morning.' },
-                        { id: 'i2', day_number: 1, time_slot: 'Lunch with a view', place_name: 'Le Jules Verne', category_name: 'Dining', place_description: 'Lunch at the second floor of Eiffel Tower.' },
-                        { id: 'i3', day_number: 1, time_slot: 'Relaxing afternoon', place_name: 'Seine River Cruise', category_name: 'Experience', place_description: 'Afternoon boat tour.' },
-                        { id: 'i4', day_number: 2, time_slot: 'Art exploration', place_name: 'Louvre Museum', category_name: 'Museum', place_description: 'Explore the world\'s largest art museum.' },
-                        { id: 'i5', day_number: 2, time_slot: 'Historic walk', place_name: 'Notre-Dame Cathedral', category_name: 'Historical', place_description: 'Walk around the iconic cathedral.' },
-                    ]
-                });
+                toast.error('Could not load itinerary details.');
             } finally {
                 setIsLoading(false);
             }

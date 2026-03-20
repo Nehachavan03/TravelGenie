@@ -1,24 +1,29 @@
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config();
 const mysql = require('mysql2');
+
+console.log('--- DB Config ---');
+console.log('Host:', process.env.DB_HOST);
+console.log('User:', process.env.DB_USER);
+console.log('Database:', process.env.DB_NAME);
+console.log('Port:', process.env.DB_PORT || 4000);
+console.log('Has Password:', !!(process.env.DB_PASS || process.env.DB_PASSWORD));
+console.log('-----------------');
 
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
+    password: process.env.DB_PASS || process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 4000
+    // Removed SSL for testing
 });
 
 db.connect((err) => {
     if (err) {
-        console.error('Error connecting to MySQL database:', err);
+        console.error('Connection failed (No SSL):', err.message);
+        console.error('Error Code:', err.code);
         process.exit(1);
     }
-    db.query('SELECT * FROM countries WHERE name = ?', ['Australia'], (err, results) => {
-        if (err) {
-            console.error(err);
-        } else {
-            console.log(results);
-        }
-        process.exit();
-    });
+    console.log('Connection successful without SSL!');
+    process.exit();
 });

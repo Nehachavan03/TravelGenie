@@ -40,25 +40,6 @@ const Login: React.FC = () => {
         }
     };
 
-    const handleGuestLogin = () => {
-        setIsLoading(true);
-        // Mock a successful login response to bypass potential backend hangs
-        // This allows the user to explore the app immediately
-        setTimeout(() => {
-            const mockUser = {
-                id: '9', // Using Demo User ID from seed data
-                name: 'Guest Explorer',
-                email: 'guest@example.com'
-            };
-            const mockToken = 'mock-guest-token-bypass-' + Date.now();
-            
-            login(mockToken, mockUser);
-            toast.success('Welcome! Logged in as Guest.');
-            navigate('/');
-            setIsLoading(false);
-        }, 800);
-    };
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl transition-all hover:shadow-2xl">
@@ -126,15 +107,6 @@ const Login: React.FC = () => {
                             }`}
                         >
                             {isLoading ? 'Signing in...' : 'Sign in'}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={handleGuestLogin}
-                            disabled={isLoading}
-                            className="w-full py-3 px-4 border-2 border-primary-600 text-primary-600 rounded-lg"
-                        >
-                            Guest Access
                         </button>
                     </div>
                 </form>
