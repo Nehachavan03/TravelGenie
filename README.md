@@ -9,6 +9,14 @@ A full-stack, AI-powered travel planning platform that helps users **discover de
 🚀 **Try it here:** https://travel-genie-nine.vercel.app/
 
 ---
+## 👤 Demo Credentials
+
+Use this account to test quickly:
+
+* Email: `demo@example.com`
+* Password: `password123`
+
+---
 
 ## 🧠 Project Overview
 
@@ -147,14 +155,7 @@ Backend runs at:
 
 ---
 
-## 👤 Demo Credentials
 
-Use this account to test quickly:
-
-* Email: `demo@example.com`
-* Password: `password123`
-
----
 
 ## 🚀 What Makes This Project Stand Out
 
