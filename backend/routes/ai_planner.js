@@ -2,66 +2,115 @@ const express = require('express');
 const router = express.Router();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+// ✅ Initialize once
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// ✅ Safe model getter (fallback included)
+function getModel() {
+  try {
+    return genAI.getGenerativeModel({
+      model: "gemini-1.5-flash-latest"
+    });
+  } catch (e) {
+    console.warn("Falling back to pro model");
+    return genAI.getGenerativeModel({
+      model: "gemini-1.5-pro-latest"
+    });
+  }
+}
+
+// -------------------- PLAN ROUTE --------------------
 router.post('/plan', async (req, res) => {
   const { city, days, budget, interests } = req.body;
 
+  // ✅ Validation (prevents runtime crash)
+  if (!city || !days || !budget || !Array.isArray(interests)) {
+    return res.status(400).json({
+      message: "city, days, budget, and interests[] are required"
+    });
+  }
+
   try {
     if (!process.env.GEMINI_API_KEY) {
-      console.warn("GEMINI_API_KEY is missing. Using fallback response.");
-      const text = `Day 1: Arrival in ${city}. Morning coffee at a local cafe. Visit the historic city center and enjoy a traditional lunch. Evening walk by the river.\n\nDay 2: Full day exploring local museums and art galleries. Optional shopping at the main district.\n\nDay 3: Nature day! Visit the botanical gardens or a nearby park. Farewell dinner at a top-rated restaurant.`;
-      return res.json({ itinerary: text });
+      console.warn("No API key → fallback");
+
+      return res.json({
+        itinerary: `Day 1: Explore ${city}\nDay 2: Culture + food\nDay 3: Nature + relax`
+      });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = getModel();
 
-    // Construct the prompt for VoyageAI Smart Planner
-    const prompt = `Act as a senior travel consultant for VoyageAI. 
-                        Plan a highly realistic ${days}-day trip to ${city} with a budget of ${budget}.
-                        User interests: ${interests.join(', ')}.
-                        
-                        Provide a detailed day-by-day itinerary with:
-                        - Morning, afternoon, and evening slots.
-                        - Specific real-world locations and activity names.
-                        - Estimated timings.
-                        
-                        Keep the response clean and well-formatted with clear headings for each day. Focus only on the itinerary steps. Do not include any introductory or concluding text.`;
+    const prompt = `
+Act as a senior travel consultant.
+
+Plan a realistic ${days}-day trip to ${city} with budget ${budget}.
+User interests: ${interests.join(", ")}.
+
+Provide:
+- Morning, Afternoon, Evening
+- Real locations
+- Approx timings
+
+ONLY itinerary. No intro or conclusion.
+`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
     res.json({ itinerary: text });
+
   } catch (error) {
-    console.error("AI Planner Error:", error);
-    res.status(500).json({ message: "Error generating the AI itinerary" });
+    console.error("AI Planner Error:", error.message);
+
+    res.status(500).json({
+      message: "Error generating itinerary"
+    });
   }
 });
 
+// -------------------- RECOMMEND ROUTE --------------------
 router.post('/recommend', async (req, res) => {
   const { favorites } = req.body;
+
+  // ✅ Validation
+  if (!Array.isArray(favorites)) {
+    return res.status(400).json({
+      message: "favorites must be an array"
+    });
+  }
+
   try {
     if (!process.env.GEMINI_API_KEY) {
-      const text = 'Since you like ' + (favorites[0] || 'beautiful places') + ', you might love visiting Kyoto for its temples or Swiss Alps for nature!';
-      return res.json({ recommendations: text });
+      return res.json({
+        recommendations:
+          `Since you like ${favorites[0] || "beautiful places"}, try Kyoto or Swiss Alps.`
+      });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = getModel();
 
-    const prompt = `The user has the following places in their favorites list: ${favorites.join(', ')}.
-                        1. Provide a very brief (1-2 sentence) summary of their travel style based on these favorites.
-                        2. Recommend 3 specific new destinations or activities worldwide that match this style.
-                        3. For each recommendation, give a 1-sentence reason why they would love it.
-                        
-                        Keep the entire response concise and well-structured.`;
+    const prompt = `
+User favorites: ${favorites.join(", ")}
+
+1. Travel style (1 line)
+2. Recommend 3 destinations
+3. 1-line reason each
+
+Keep concise.
+`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
     res.json({ recommendations: text });
+
   } catch (error) {
-    console.error("AI Recommend Error:", error);
-    res.status(500).send('AI Error');
+    console.error("AI Recommend Error:", error.message);
+
+    res.status(500).json({
+      message: "Error generating recommendations"
+    });
   }
 });
 

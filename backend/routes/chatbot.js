@@ -2,74 +2,114 @@ const express = require("express");
 const router = express.Router();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
+// ✅ Initialize once (important)
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// ✅ Safe model getter (with fallback)
+function getModel() {
+  try {
+    return genAI.getGenerativeModel({
+      model: "gemini-1.5-flash-latest"
+    });
+  } catch (e) {
+    console.warn("Fallback to pro model");
+    return genAI.getGenerativeModel({
+      model: "gemini-1.5-pro-latest"
+    });
+  }
+}
+
 router.post("/", async (req, res) => {
   const { message } = req.body;
 
-  if (!message) {
+  // ✅ Input validation
+  if (!message || typeof message !== "string") {
     return res.json({
       message: "Please ask something like '3 day trip in Paris'"
     });
   }
 
   try {
+    // ✅ Fallback if no API key
     if (!process.env.GEMINI_API_KEY) {
-      console.warn("GEMINI_API_KEY is missing. Using fallback response.");
       return res.json({
-        message: "I'm your AI Travel Planner! Be sure to add your GEMINI_API_KEY to see my real capabilities."
+        message: "AI key missing. Running in demo mode."
       });
     }
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = getModel();
 
-    const prompt = `You are a helpful and enthusiastic AI Travel Assistant for "VoyageAI", a travel planning app. 
-    
-    App Context:
-    - To Login: Click the "Login" button in the navigation bar. You can use the Guest account (guest@example.com / guestpassword123) for a quick look.
-    - Features: Users can explore countries/cities, view places, add places to their favorites, and generate smart itineraries.
-    - Smart Planner: Users can go to the "Smart Planner" page to generate a multi-day trip based on their budget and interests.
-    - Favorites: Click the Heart icon on any place to save it to your Favorites list.
+    // ✅ STRONG JSON prompt (more reliable)
+    const prompt = `
+You are an AI Travel Assistant for VoyageAI.
 
-    The user said: "${message}"
+User message: "${message}"
 
-    Respond ONLY with a valid JSON object matching this schema:
+STRICT RULES:
+- Output ONLY valid JSON
+- NO markdown
+- NO explanation text
+- NO extra text outside JSON
+
+JSON format:
+{
+  "message": "string",
+  "plan": [
     {
-      "message": "A conversational response acknowledging the request and providing a helpful reply.",
-      "plan": [ 
-        {
-          "day": 1,
-          "title": "A short, catchy title for the day",
-          "description": "A brief description of the day's theme",
-          "places": [
-            { "time": "09:00 AM", "name": "Name of the place or activity" }
-          ]
-        }
+      "day": 1,
+      "title": "string",
+      "description": "string",
+      "places": [
+        { "time": "09:00 AM", "name": "string" }
       ]
     }
+  ]
+}
 
-    Note: The "plan" array is optional. ONLY include it if the user asks for a trip plan. If they ask about app features or login, provide the info in the "message" field and omit "plan". Do not include any text outside the JSON.`;
+Rules:
+- If user asks for travel plan → include "plan"
+- Otherwise → ONLY return "message"
+`;
 
     const result = await model.generateContent(prompt);
     let responseText = result.response.text();
-    
-    // Clean up potential markdown code blocks if the AI includes them
-    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    // ✅ Clean markdown if model adds it
+    responseText = responseText
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    // ✅ EXTRA SAFETY: extract JSON only
+    const jsonStart = responseText.indexOf("{");
+    const jsonEnd = responseText.lastIndexOf("}");
+
+    if (jsonStart === -1 || jsonEnd === -1) {
+      throw new Error("No JSON found in response");
+    }
+
+    const cleanJSON = responseText.slice(jsonStart, jsonEnd + 1);
 
     try {
-      const parsedData = JSON.parse(responseText);
-      res.json(parsedData);
+      const parsedData = JSON.parse(cleanJSON);
+      return res.json(parsedData);
     } catch (parseError) {
-      console.error('Failed to parse Gemini JSON. Raw text:', responseText);
-      res.json({ message: "I've processed your request, but I had trouble formatting the response. " + responseText.substring(0, 100) + "..." });
+      console.error("JSON PARSE ERROR:", cleanJSON);
+
+      return res.json({
+        message: "AI formatting issue. Try again."
+      });
     }
 
   } catch (error) {
-    console.error('Detailed Chatbot AI Error:', {
+    console.error("CHATBOT ERROR:", {
       message: error.message,
-      stack: error.stack,
-      details: error.response?.data
+      stack: error.stack
     });
-    res.status(500).json({ message: "AI service error: " + (error.message || "Unknown error") });
+
+    return res.status(500).json({
+      message: "AI service error: " + error.message
+    });
   }
 });
 
