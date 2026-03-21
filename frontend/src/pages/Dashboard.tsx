@@ -89,14 +89,27 @@ const Dashboard: React.FC = () => {
         fetchAllCities();
     }, [user]);
 
-    const handleCreateTrip = async (e: React.FormEvent) => {
+    const handleCreateTrip = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!selectedCityId || !startDate || !endDate || !budget) {
+        
+        const formData = new FormData(e.currentTarget);
+        const cityId = formData.get('city_id') as string;
+        const startDateVal = formData.get('start_date') as string;
+        const endDateVal = formData.get('end_date') as string;
+        const budgetVal = formData.get('budget_level') as string;
+
+        // Use FormData as primary, state as fallback if needed (though FormData is more reliable for direct DOM access)
+        const finalCityId = cityId || selectedCityId;
+        const finalStartDate = startDateVal || startDate;
+        const finalEndDate = endDateVal || endDate;
+        const finalBudget = budgetVal || budget;
+
+        if (!finalCityId || !finalStartDate || !finalEndDate || !finalBudget) {
             toast.error('Please fill in all fields');
             return;
         }
 
-        if (new Date(startDate) > new Date(endDate)) {
+        if (new Date(finalStartDate) > new Date(finalEndDate)) {
             toast.error('End date must be after start date');
             return;
         }
@@ -104,27 +117,27 @@ const Dashboard: React.FC = () => {
         setIsSubmitting(true);
         try {
             let numericBudget = 5000;
-            if (budget === 'Low') numericBudget = 1000;
-            if (budget === 'High') numericBudget = 10000;
+            if (finalBudget === 'Low') numericBudget = 1000;
+            if (finalBudget === 'High') numericBudget = 10000;
 
             const payload = {
                 user_id: user?.id,
-                city_id: selectedCityId,
-                start_date: startDate,
-                end_date: endDate,
+                city_id: finalCityId,
+                start_date: finalStartDate,
+                end_date: finalEndDate,
                 budget: numericBudget
             };
 
             const response = await api.post('/itinerary/create', payload);
             
-            const cityName = availableCities.find(c => c.id.toString() === selectedCityId.toString())?.name || 'New Trip';
+            const cityName = availableCities.find(c => c.id.toString() === finalCityId.toString())?.name || 'New Trip';
 
             const newTrip: Trip = {
                 itinerary_id: response.data.itinerary_id,
                 city: cityName,
-                start_date: startDate,
-                end_date: endDate,
-                budget: budget,
+                start_date: finalStartDate,
+                end_date: finalEndDate,
+                budget: budget, // Using the string label 'Low'/'Medium'/'High'
                 image_url: `https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=1000`
             };
             
@@ -132,9 +145,10 @@ const Dashboard: React.FC = () => {
             setIsCreateModalOpen(false);
             resetForm();
             toast.success('Trip created successfully!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating trip:', error);
-            toast.error('Failed to create trip.');
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create trip.';
+            toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -278,6 +292,7 @@ const Dashboard: React.FC = () => {
                                     </div>
                                     <select
                                         id="cityId"
+                                        name="city_id"
                                         value={selectedCityId}
                                         onChange={(e) => setSelectedCityId(e.target.value)}
                                         className="w-full rounded-xl border-gray-200 border pl-10 pr-4 py-3 text-gray-900 font-bold focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-gray-50"
@@ -299,6 +314,7 @@ const Dashboard: React.FC = () => {
                                     <input
                                         type="date"
                                         id="startDate"
+                                        name="start_date"
                                         value={startDate}
                                         onChange={(e) => setStartDate(e.target.value)}
                                         className="w-full rounded-xl border-gray-200 border px-4 py-3 text-gray-900 font-bold focus:ring-2 focus:ring-primary-500 bg-gray-50"
@@ -312,6 +328,7 @@ const Dashboard: React.FC = () => {
                                     <input
                                         type="date"
                                         id="endDate"
+                                        name="end_date"
                                         value={endDate}
                                         onChange={(e) => setEndDate(e.target.value)}
                                         className="w-full rounded-xl border-gray-200 border px-4 py-3 text-gray-900 font-bold focus:ring-2 focus:ring-primary-500 bg-gray-50"
@@ -326,6 +343,7 @@ const Dashboard: React.FC = () => {
                                 </label>
                                 <select
                                     id="budget"
+                                    name="budget_level"
                                     value={budget}
                                     onChange={(e) => setBudget(e.target.value)}
                                     className="w-full rounded-xl border-gray-200 border px-4 py-3 text-gray-900 font-bold focus:ring-2 focus:ring-primary-500 bg-gray-50 transition-all"

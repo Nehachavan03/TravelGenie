@@ -60,6 +60,7 @@ CREATE TABLE itinerary_details (
     itinerary_id INT NOT NULL,
     day_no INT NOT NULL,
     place_id INT NOT NULL,
+    time_slot VARCHAR(255) DEFAULT '10:00 AM',
     FOREIGN KEY (itinerary_id) REFERENCES itineraries(itinerary_id) ON DELETE CASCADE,
     FOREIGN KEY (place_id) REFERENCES places(place_id)
 );

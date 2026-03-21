@@ -33,7 +33,7 @@ router.post('/create', (req, res) => {
 // Add place to itinerary
 router.post('/add-place', (req, res) => {
   const { itinerary_id, day_no, place_id, notes } = req.body;
-  db.query('INSERT INTO itinerary_details (itinerary_id, day_no, place_id, notes) VALUES (?, ?, ?, ?)', [itinerary_id, day_no, place_id, notes || ''], (err, result) => {
+  db.query('INSERT INTO itinerary_details (itinerary_id, day_no, place_id, time_slot) VALUES (?, ?, ?, ?)', [itinerary_id, day_no, place_id, notes || ''], (err, result) => {
     if (err) return res.status(500).send('Database error');
     res.json({ message: 'Place added to itinerary' });
   });
@@ -44,12 +44,22 @@ router.get('/details/:itinerary_id', (req, res) => {
   const itineraryId = req.params.itinerary_id;
   const headerQuery = 'SELECT i.itinerary_id AS id, c.name AS city_name, c.city_id, i.start_date, i.end_date, i.budget FROM itineraries i JOIN cities c ON i.city_id = c.city_id WHERE i.itinerary_id = ?';
   db.query(headerQuery, [itineraryId], (err, headerResults) => {
-    if (err) return res.status(500).send('Database error');
-    if (headerResults.length === 0) return res.status(404).send('Not found');
+    if (err) {
+      console.error('Header Query Error for ID', itineraryId, ':', err);
+      return res.status(500).send('Database error');
+    }
+    if (headerResults.length === 0) {
+      console.log('Itinerary ID', itineraryId, 'NOT FOUND');
+      return res.status(404).send('Not found');
+    }
     const trip = headerResults[0];
-    const itemsQuery = 'SELECT id.detail_id AS id, id.day_no AS day_number, id.notes AS time_slot, p.name AS place_name, p.description AS place_description, c.category_name FROM itinerary_details id JOIN places p ON id.place_id = p.place_id JOIN categories c ON p.category_id = c.category_id WHERE id.itinerary_id = ? ORDER BY id.day_no';
+    const itemsQuery = 'SELECT id.detail_id AS id, id.day_no AS day_number, id.time_slot, p.name AS place_name, p.description AS place_description, c.category_name FROM itinerary_details id JOIN places p ON id.place_id = p.place_id JOIN categories c ON p.category_id = c.category_id WHERE id.itinerary_id = ? ORDER BY id.day_no';
     db.query(itemsQuery, [itineraryId], (err, itemsResults) => {
-      if (err) return res.status(500).send('Database error');
+      if (err) {
+        console.error('Items Query Error for ID', itineraryId, ':', err);
+        return res.status(500).send('Database error');
+      }
+      console.log('Successfully fetched', itemsResults.length, 'items for itinerary', itineraryId);
       trip.items = itemsResults;
       res.json(trip);
     });

@@ -33,8 +33,12 @@ const TripTimeline: React.FC = () => {
             try {
                 const response = await api.get(`/itinerary/details/${id}`);
                 setTrip(response.data);
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Error fetching itinerary details:', error);
+                if (error.response) {
+                    console.error('Error response data:', error.response.data);
+                    console.error('Error status:', error.response.status);
+                }
                 toast.error('Could not load itinerary details.');
             } finally {
                 setIsLoading(false);
