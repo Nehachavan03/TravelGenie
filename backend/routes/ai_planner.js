@@ -15,10 +15,17 @@ router.post('/plan', async (req, res) => {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // Construct the prompt
-    const prompt = `Plan a ${days}-day trip to ${city} with a ${budget} budget.
+    // Construct the prompt for VoyageAI Smart Planner
+    const prompt = `Act as a senior travel consultant for VoyageAI. 
+                        Plan a highly realistic ${days}-day trip to ${city} with a budget of ${budget}.
                         User interests: ${interests.join(', ')}.
-                        Provide a brief day-by-day itinerary with morning, afternoon, and evening activities. Keep the response clean and well-formatted. Focus only on the itinerary steps. Do not include introductory text.`;
+                        
+                        Provide a detailed day-by-day itinerary with:
+                        - Morning, afternoon, and evening slots.
+                        - Specific real-world locations and activity names.
+                        - Estimated timings.
+                        
+                        Keep the response clean and well-formatted with clear headings for each day. Focus only on the itinerary steps. Do not include any introductory or concluding text.`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();
@@ -41,7 +48,12 @@ router.post('/recommend', async (req, res) => {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = 'Based on these favorite places: ' + favorites.join(', ') + ', recommend 3 similar destinations or activities world-wide. Provide brief reasons why.';
+    const prompt = `The user has the following places in their favorites list: ${favorites.join(', ')}.
+                        1. Provide a very brief (1-2 sentence) summary of their travel style based on these favorites.
+                        2. Recommend 3 specific new destinations or activities worldwide that match this style.
+                        3. For each recommendation, give a 1-sentence reason why they would love it.
+                        
+                        Keep the entire response concise and well-structured.`;
 
     const result = await model.generateContent(prompt);
     const text = result.response.text();

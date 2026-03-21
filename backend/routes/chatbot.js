@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    // We use gemini-2.5-flash and force it to output structured JSON
+    // Using gemini-1.5-flash and requesting JSON output
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
       generationConfig: {
