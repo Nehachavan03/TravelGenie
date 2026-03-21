@@ -30,7 +30,7 @@ const Dashboard: React.FC = () => {
     const [selectedCityId, setSelectedCityId] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [budget, setBudget] = useState('Medium');
+    const [budget, setBudget] = useState('Standard');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -50,7 +50,7 @@ const Dashboard: React.FC = () => {
                         city: 'Paris',
                         start_date: '2025-06-10',
                         end_date: '2025-06-12',
-                        budget: 'High',
+                        budget: '20000',
                         image_url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&q=80&w=1000'
                     },
                     {
@@ -58,7 +58,7 @@ const Dashboard: React.FC = () => {
                         city: 'Mumbai',
                         start_date: '2025-12-25',
                         end_date: '2025-12-28',
-                        budget: 'Medium',
+                        budget: '15000',
                         image_url: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&q=80&w=1000'
                     }
                 ]);
@@ -116,9 +116,9 @@ const Dashboard: React.FC = () => {
 
         setIsSubmitting(true);
         try {
-            let numericBudget = 5000;
-            if (finalBudget === 'Low') numericBudget = 1000;
-            if (finalBudget === 'High') numericBudget = 10000;
+            let numericBudget = 15000;
+            if (finalBudget === 'Backpacker') numericBudget = 10000;
+            if (finalBudget === 'Luxury') numericBudget = 20000;
 
             const payload = {
                 user_id: user?.id,
@@ -137,7 +137,7 @@ const Dashboard: React.FC = () => {
                 city: cityName,
                 start_date: finalStartDate,
                 end_date: finalEndDate,
-                budget: budget, // Using the string label 'Low'/'Medium'/'High'
+                budget: numericBudget.toString(),
                 image_url: `https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&q=80&w=1000`
             };
             
@@ -174,7 +174,7 @@ const Dashboard: React.FC = () => {
         if (availableCities.length > 0) setSelectedCityId(availableCities[0].id);
         setStartDate('');
         setEndDate('');
-        setBudget('Medium');
+        setBudget('Standard');
     };
 
     return (
@@ -348,9 +348,9 @@ const Dashboard: React.FC = () => {
                                     onChange={(e) => setBudget(e.target.value)}
                                     className="w-full rounded-xl border-gray-200 border px-4 py-3 text-gray-900 font-bold focus:ring-2 focus:ring-primary-500 bg-gray-50 transition-all"
                                 >
-                                    <option value="Low">Low (Backpacker)</option>
-                                    <option value="Medium">Medium (Standard)</option>
-                                    <option value="High">High (Luxury)</option>
+                                    <option value="Backpacker">Backpacker (10000+)</option>
+                                    <option value="Standard">Standard (15000+)</option>
+                                    <option value="Luxury">Luxury (20000+)</option>
                                 </select>
                             </div>
 
