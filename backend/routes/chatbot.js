@@ -2,22 +2,13 @@ const express = require("express");
 const router = express.Router();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// ✅ Initialize once (important)
+// ✅ Initialize once
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// ✅ Safe model getter (with fallback)
-function getModel() {
-  try {
-    return genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-latest"
-    });
-  } catch (e) {
-    console.warn("Fallback to pro model");
-    return genAI.getGenerativeModel({
-      model: "gemini-1.5-pro-latest"
-    });
-  }
-}
+// ✅ Use ONLY working model
+const model = genAI.getGenerativeModel({
+  model: "gemini-pro"
+});
 
 router.post("/", async (req, res) => {
   const { message } = req.body;
@@ -30,28 +21,23 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    // ✅ Fallback if no API key
     if (!process.env.GEMINI_API_KEY) {
       return res.json({
         message: "AI key missing. Running in demo mode."
       });
     }
 
-    const model = getModel();
-
-    // ✅ STRONG JSON prompt (more reliable)
     const prompt = `
-You are an AI Travel Assistant for VoyageAI.
+You are an AI Travel Assistant.
 
-User message: "${message}"
+User: "${message}"
 
 STRICT RULES:
 - Output ONLY valid JSON
-- NO markdown
-- NO explanation text
-- NO extra text outside JSON
+- No markdown
+- No extra text
 
-JSON format:
+Format:
 {
   "message": "string",
   "plan": [
@@ -67,45 +53,41 @@ JSON format:
 }
 
 Rules:
-- If user asks for travel plan → include "plan"
-- Otherwise → ONLY return "message"
+- If NOT planning → only return "message"
 `;
 
     const result = await model.generateContent(prompt);
     let responseText = result.response.text();
 
-    // ✅ Clean markdown if model adds it
+    // ✅ Clean response
     responseText = responseText
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    // ✅ EXTRA SAFETY: extract JSON only
-    const jsonStart = responseText.indexOf("{");
-    const jsonEnd = responseText.lastIndexOf("}");
+    // ✅ Extract JSON safely
+    const start = responseText.indexOf("{");
+    const end = responseText.lastIndexOf("}");
 
-    if (jsonStart === -1 || jsonEnd === -1) {
-      throw new Error("No JSON found in response");
+    if (start === -1 || end === -1) {
+      throw new Error("Invalid JSON from AI");
     }
 
-    const cleanJSON = responseText.slice(jsonStart, jsonEnd + 1);
+    const json = responseText.slice(start, end + 1);
 
     try {
-      const parsedData = JSON.parse(cleanJSON);
-      return res.json(parsedData);
-    } catch (parseError) {
-      console.error("JSON PARSE ERROR:", cleanJSON);
+      const parsed = JSON.parse(json);
+      return res.json(parsed);
+    } catch (err) {
+      console.error("JSON PARSE FAIL:", json);
 
       return res.json({
-        message: "AI formatting issue. Try again."
+        message: "AI response formatting issue"
       });
     }
 
   } catch (error) {
-    console.error("CHATBOT ERROR:", {
-      message: error.message,
-      stack: error.stack
-    });
+    console.error("CHATBOT ERROR:", error.message);
 
     return res.status(500).json({
       message: "AI service error: " + error.message
