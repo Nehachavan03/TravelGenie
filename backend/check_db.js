@@ -14,16 +14,19 @@ const db = mysql.createConnection({
     user: process.env.DB_USER,
     password: process.env.DB_PASS || process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 4000
-    // Removed SSL for testing
+    port: process.env.DB_PORT || 4000,
+    ssl: {
+        minVersion: 'TLSv1.2',
+        rejectUnauthorized: true
+    }
 });
 
 db.connect((err) => {
     if (err) {
-        console.error('Connection failed (No SSL):', err.message);
+        console.error('Connection failed (With SSL):', err.message);
         console.error('Error Code:', err.code);
         process.exit(1);
     }
-    console.log('Connection successful without SSL!');
+    console.log('Connection successful with SSL!');
     process.exit();
 });

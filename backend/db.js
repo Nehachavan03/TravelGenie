@@ -10,11 +10,10 @@ const db = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  /*
   ssl: {
+    minVersion: 'TLSv1.2',
     rejectUnauthorized: true
   }
-  */
 });
 
 // Using pool.query() directly is recommended, but we can verify the pool

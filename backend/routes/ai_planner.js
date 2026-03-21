@@ -13,7 +13,7 @@ router.post('/plan', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     // Construct the prompt
     const prompt = `Plan a ${days}-day trip to ${city} with a ${budget} budget.
@@ -39,7 +39,7 @@ router.post('/recommend', async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = 'Based on these favorite places: ' + favorites.join(', ') + ', recommend 3 similar destinations or activities world-wide. Provide brief reasons why.';
 

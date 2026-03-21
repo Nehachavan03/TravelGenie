@@ -1,9 +1,15 @@
+require('dotenv').config();
 const mysql = require('mysql2');
 const db = mysql.createConnection({
-  host: '127.0.0.1',
-  user: 'root',
-  password: 'Rutvij@1234',
-  database: 'travel_planner'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS || process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT || 4000,
+  ssl: {
+    minVersion: 'TLSv1.2',
+    rejectUnauthorized: true
+  }
 });
 
 const itineraryId = 6; // Paris trip from subagent logs
