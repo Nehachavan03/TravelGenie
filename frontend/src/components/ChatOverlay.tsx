@@ -72,41 +72,15 @@ const ChatOverlay: React.FC = () => {
             };
 
             setMessages(prev => [...prev, assistantMsg]);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Chat error:', error);
-
-            // Fallback Mock AI Response for demonstration
-            setTimeout(() => {
-                const mockResponse: Message = {
-                    id: (Date.now() + 1).toString(),
-                    role: 'assistant',
-                    content: "Based on your interests, I've created a 2-day itinerary for you!",
-                    plan: [
-                        {
-                            day: 1,
-                            title: "Classic City Highlights",
-                            description: "Explore the most iconic landmarks and get a feel for the city's rich history.",
-                            places: [
-                                { time: '09:00 AM', name: 'Historic City Center' },
-                                { time: '01:00 PM', name: 'Local Gastronomy Market' },
-                                { time: '04:00 PM', name: 'Sunset Viewpoint' }
-                            ]
-                        },
-                        {
-                            day: 2,
-                            title: "Art & Culture",
-                            description: "Immerse yourself in world-class museums and local neighborhoods.",
-                            places: [
-                                { time: '10:00 AM', name: 'National Arts Museum' },
-                                { time: '02:30 PM', name: 'Bohemian Quarter Walk' }
-                            ]
-                        }
-                    ]
-                };
-                setMessages(prev => [...prev, mockResponse]);
-                setIsTyping(false);
-            }, 1500);
-
+            
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: error.response?.data?.message || "I'm having trouble connecting to the travel assistant. Please check if the backend is running and the GEMINI_API_KEY is set correctly."
+            };
+            setMessages(prev => [...prev, errorMessage]);
         } finally {
             setIsTyping(false);
         }
