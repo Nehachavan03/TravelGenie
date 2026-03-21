@@ -20,14 +20,7 @@ router.post("/", async (req, res) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-    // Using gemini-1.5-flash and requesting JSON output
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json",
-      }
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `You are a helpful and enthusiastic AI Travel Assistant for "VoyageAI", a travel planning app. 
     
@@ -39,7 +32,7 @@ router.post("/", async (req, res) => {
 
     The user said: "${message}"
 
-    Respond with a JSON object exactly matching this schema:
+    Respond ONLY with a valid JSON object matching this schema:
     {
       "message": "A conversational response acknowledging the request and providing a helpful reply.",
       "plan": [ 
@@ -54,22 +47,29 @@ router.post("/", async (req, res) => {
       ]
     }
 
-    Note: The "plan" array is optional and should ONLY be included if the user is asking for an itinerary or a trip plan. If they ask about app features or login, provide the information in the "message" field and omit the "plan".`;
+    Note: The "plan" array is optional. ONLY include it if the user asks for a trip plan. If they ask about app features or login, provide the info in the "message" field and omit "plan". Do not include any text outside the JSON.`;
 
     const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
+    let responseText = result.response.text();
+    
+    // Clean up potential markdown code blocks if the AI includes them
+    responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
 
     try {
       const parsedData = JSON.parse(responseText);
       res.json(parsedData);
     } catch (parseError) {
-      console.error('Failed to parse Gemini JSON:', responseText);
-      res.json({ message: "I'm sorry, I couldn't formulate a proper response to that. Could you try rephrasing?" });
+      console.error('Failed to parse Gemini JSON. Raw text:', responseText);
+      res.json({ message: "I've processed your request, but I had trouble formatting the response. " + responseText.substring(0, 100) + "..." });
     }
 
   } catch (error) {
-    console.error('Chatbot AI Error:', error);
-    res.status(500).json({ message: "AI service error" });
+    console.error('Detailed Chatbot AI Error:', {
+      message: error.message,
+      stack: error.stack,
+      details: error.response?.data
+    });
+    res.status(500).json({ message: "AI service error: " + (error.message || "Unknown error") });
   }
 });
 
